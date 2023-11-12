@@ -1,4 +1,9 @@
 <script lang="ts">
+	import 'bootstrap/dist/css/bootstrap.min.css';
+	import 'bootstrap-icons/font/bootstrap-icons.min.css';
+
+	import '$lib/styles/global.scss';
+
 	import Navbar from '$lib/components/Navbar.svelte';
 	import { onDestroy, onMount } from 'svelte';
 
@@ -29,7 +34,6 @@
 			onRemove: () => {}
 		});
 	};
-
 </script>
 
 <Navbar />

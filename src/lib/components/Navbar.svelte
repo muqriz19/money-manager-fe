@@ -1,5 +1,5 @@
 <script lang="ts">
-	import type { RouteItem, RouteMetaData } from '$lib/data/core';
+	import type { RouteItem } from '$lib/data/core';
 	import { page } from '$app/stores';
 
 	import icon from '$lib/assets/icons/money-manager-icon.svg';
@@ -20,11 +20,22 @@
 					name: 'All'
 				},
 				{
-					path: '/accounts/editor',
-					name: 'New',
-					metaData: {
-						data: { mode: 'new' }
-					}
+					path: '/accounts/new',
+					name: 'New'
+				}
+			]
+		},
+		{
+			path: '/categories',
+			name: 'Categories',
+			children: [
+				{
+					path: '/categories',
+					name: 'All'
+				},
+				{
+					path: '/categories/new',
+					name: 'New'
 				}
 			]
 		}
@@ -94,7 +105,13 @@
 </nav>
 
 <style lang="scss">
-	.icon {
-		height: 32px;
+	.dropdown-item.active,
+	.dropdown-item:active {
+		background-color: $green-color-alt;
+	}
+
+	.dropdown-item:focus,
+	.dropdown-item:hover {
+		background-color: $green-color;
 	}
 </style>

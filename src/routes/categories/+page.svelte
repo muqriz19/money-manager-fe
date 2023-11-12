@@ -14,7 +14,7 @@
 	} from '$lib/helpers/utils';
 	import ToastStore from '../../stores/ToastStore';
 
-	let accountTableHeaders: TableHeader[] = [
+	let allTableHeaders: TableHeader[] = [
 		{
 			name: 'Name',
 			canSort: true,
@@ -26,30 +26,21 @@
 			width: 'auto'
 		},
 		{
-			name: 'Created Date',
-			canSort: true,
-			width: 'auto'
+			name: 'Icon',
+			canSort: false,
+			width: '10%'
 		},
 		{
-			name: 'Action',
+			name: 'Actions',
 			canSort: true,
-			width: '12%'
+			width: '15%'
 		}
 	];
 
 	let tableConfig: TableConfig = {
 		api: {
-			path: APIS.ACCOUNTS,
-			queries: [
-				{
-					queryName: 'pageNumber',
-					queryValue: '1'
-				},
-				{
-					queryName: 'pageSize',
-					queryValue: '10'
-				}
-			],
+			path: 'Categories',
+			queries: [],
 			search: {
 				query: {
 					queryName: 'search',
@@ -58,8 +49,9 @@
 			}
 		},
 		dataHandle: {
-			pageCount: 10,
 			property: 'data',
+			pageCount: 10,
+			refTotal: 'total',
 			dataProps: [
 				{
 					name: 'name'
@@ -71,41 +63,45 @@
 					}
 				},
 				{
-					name: 'createdDate',
-					command: (row) => {
-						const date = new Date(row.createdDate).toDateString();
+					name: 'iconSet+iconName',
+					command(row) {
+						if (row?.iconSet === 'bootstrapIcons') {
+							const iTag = document.createElement('i');
 
-						return date;
+							iTag.setAttribute('class', `bi bi-${row?.iconName} iconSet`);
+							iTag.setAttribute('title', row?.iconName);
+							iTag.setAttribute('data-icon-set', row.iconSet);
+							iTag.style.fontSize = '16px';
+
+							return iTag;
+						} else {
+							return '';
+						}
 					}
 				},
 				{
 					name: 'actions'
 				}
-			],
-
-			refTotal: 'total'
+			]
 		},
 		actions: {
-			has: {
-				edit: true,
-				delete: true,
-				view: true
-			},
+			has: { edit: true, delete: true, view: true },
+
 			methods: {
 				viewRow: (rowData: any) => {
 					const id = rowData.id;
 
-					navigateTo('accounts/view/' + id);
+					navigateTo('categories/view/' + id);
 				},
 				editRow: (rowData: any) => {
-					saveData(rowData, StorageItems.Accounts);
+					saveData(rowData, StorageItems.Categories);
 
-					navigateTo('accounts/edit');
+					navigateTo('categories/edit');
 				},
 				delete: {
 					deleteRow: async (rowData: any) => {
 						const id = rowData.id;
-						const path = APIS.ACCOUNTS + '/' + id;
+						const path = APIS.CATEGORIES + '/' + id;
 
 						const confirmed = await confirmAction({ modalConfig });
 
@@ -114,7 +110,7 @@
 								fetchData(HTTP_METHOD.DELETE, path, null)
 									.then((resp) => {
 										ToastStore.set({
-											message: 'Successful in deleting account',
+											message: 'Successful in deleting category',
 											title: 'Success',
 											type: 'success'
 										});
@@ -147,31 +143,31 @@
 			}
 		},
 		head: {
-			title: 'Delete Account?'
+			title: 'Delete Category?'
 		},
 		body: {
 			component: Confirmation,
-			props: { message: 'You are about to delete this account, are you sure you want to do that?' }
+			props: { message: 'You are about to delete this category, are you sure you want to do that?' }
 		}
 	};
 </script>
 
 <div class="page">
 	<div class="page-top">
-		<h1>Accounts</h1>
+		<h1>Categories</h1>
 	</div>
 
 	<div class="page-middle">
 		<div class="row">
 			<div class="col-sm-3 col-md-0 col-lg-1">
-				<button type="button" class="btn btn-primary" on:click={() => navigateTo('/accounts/new')}
+				<button type="button" class="btn btn-primary" on:click={() => navigateTo('/categories/new')}
 					>New</button
 				>
 			</div>
 		</div>
 
 		<div class="mt-4">
-			<Table bind:tableHeaders={accountTableHeaders} bind:tableConfig />
+			<Table bind:tableHeaders={allTableHeaders} bind:tableConfig />
 		</div>
 	</div>
 </div>

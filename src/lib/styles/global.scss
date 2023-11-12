@@ -1,0 +1,99 @@
+.mm-btn {
+    border: 1px solid $green-color;
+    background-color: $green-color;
+    color: $white-color;
+
+    border-radius: 5px;
+}
+
+.mm-btn:hover {
+    background-color: $green-color-alt;
+}
+
+.icon {
+    height: 32px;
+}
+
+.btn {
+    background-color: $green-color;
+    border: 1px solid $green-color-alt;
+
+    &:hover {
+        background-color: $green-color-alt;
+        border: 1px solid $green-color-alt;
+    }
+}
+
+.mini-fab {
+    position: absolute;
+    top: -5px;
+    right: -5px;
+    height: 16px;
+    border: 1px solid black;
+    border-radius: 360px;
+    width: 16px;
+    background-color: $white-color;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    &:hover {
+        background-color: $green-color-alt;
+
+        i {
+            color: $white-color;
+        }
+    }
+
+    i {
+        font-size: 14px;
+    }
+}
+
+@mixin iconSetStandard {
+    border-radius: 5px;
+    padding: 5px;
+    text-align: center;
+    background-color: $white-color;
+    border: 1px solid $grey-color;
+
+    &:hover {
+        cursor: pointer;
+        background-color: $green-color;
+        color: $white-color;
+    }
+}
+
+button.iconSet {
+    height: 64px;
+    width: 64px;
+
+    @include iconSetStandard();
+}
+
+i[data-icon-set*=bootstrapIcons].iconSet {
+    font-size: 32px;
+
+    @include iconSetStandard();
+}
+
+// override active buttons
+.btn:first-child:active {
+    background-color: $green-color-alt;
+    border: 1px solid $green-color-alt;
+}
+
+.btn-check:checked+.btn,
+.btn.active,
+.btn.show,
+.btn:first-child:active,
+:not(.btn-check)+.btn:active {
+    background-color: $green-color-alt;
+    border: 1px solid $green-color-alt;
+}
+
+.btn:disabled {
+    background-color: $green-color;
+    border: 1px solid $green-color-alt;
+}
