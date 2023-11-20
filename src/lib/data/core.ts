@@ -2,8 +2,11 @@ export interface RouteItem {
     path: string;
     name: string;
     children?: RouteItem[];
-    metaData?: RouteMetaData
+    metaData?: RouteMetaData;
+    command?: RouteCommand;
 }
+
+type RouteCommand = ($event: any) => any;
 
 export interface RouteMetaData {
     data: any;
@@ -11,7 +14,8 @@ export interface RouteMetaData {
 
 export enum StorageItems {
     Accounts = 'Accounts',
-    Categories = 'Categories'
+    Categories = 'Categories',
+    Profile = "Profile"
 }
 
 export interface IconSet {

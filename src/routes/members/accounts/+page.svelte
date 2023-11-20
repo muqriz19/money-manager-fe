@@ -12,7 +12,7 @@
 		navigateTo,
 		saveData
 	} from '$lib/helpers/utils';
-	import ToastStore from '../../stores/ToastStore';
+	import ToastStore from '../../../stores/ToastStore';
 
 	let accountTableHeaders: TableHeader[] = [
 		{
@@ -164,7 +164,7 @@
 	<div class="page-middle">
 		<div class="row">
 			<div class="col-sm-3 col-md-0 col-lg-1">
-				<button type="button" class="btn btn-primary" on:click={() => navigateTo('/accounts/new')}
+				<button type="button" class="btn btn-primary" on:click={() => navigateTo('members/accounts/new')}
 					>New</button
 				>
 			</div>

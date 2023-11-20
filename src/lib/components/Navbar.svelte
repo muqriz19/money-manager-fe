@@ -3,6 +3,9 @@
 	import { page } from '$app/stores';
 
 	import icon from '$lib/assets/icons/money-manager-icon.svg';
+	import AppProfileAvatar from './AppProfileAvatar.svelte';
+	import { onDestroy, onMount } from 'svelte';
+	import ProfileStore from '../../stores/ProfileStore';
 
 	let currentRoute: string = '';
 
@@ -12,34 +15,53 @@
 			name: 'Home'
 		},
 		{
-			path: '/accounts',
+			path: 'members/accounts',
 			name: 'Accounts',
 			children: [
 				{
-					path: '/accounts',
+					path: 'members/accounts',
 					name: 'All'
 				},
 				{
-					path: '/accounts/new',
+					path: 'members/accounts/new',
 					name: 'New'
 				}
 			]
 		},
 		{
-			path: '/categories',
+			path: 'members/categories',
 			name: 'Categories',
 			children: [
 				{
-					path: '/categories',
+					path: 'members/categories',
 					name: 'All'
 				},
 				{
-					path: '/categories/new',
+					path: 'members/categories/new',
 					name: 'New'
 				}
 			]
 		}
 	];
+
+	let allowedRoutes: RouteItem[] = [];
+
+	onMount(() => {
+		init();
+	});
+
+	onDestroy(() => {});
+
+	function init() {
+		ProfileStore.subscribe((profileData) => {
+			if (profileData && profileData.token !== '') {
+				// filtered allowed
+				allowedRoutes = allRoutes;
+			} else {
+				allowedRoutes = [allRoutes[0]];
+			}
+		});
+	}
 
 	function getCurrentRoute(path: string) {
 		currentRoute = path;
@@ -66,7 +88,7 @@
 		</button>
 		<div class="collapse navbar-collapse" id="navbarSupportedContent">
 			<ul class="navbar-nav me-auto mb-2 mb-lg-0">
-				{#each allRoutes as parentRoute}
+				{#each allowedRoutes as parentRoute}
 					{#if !parentRoute?.children}
 						<li class="nav-item">
 							<a
@@ -100,18 +122,8 @@
 					{/if}
 				{/each}
 			</ul>
+
+			<AppProfileAvatar />
 		</div>
 	</div>
 </nav>
-
-<style lang="scss">
-	.dropdown-item.active,
-	.dropdown-item:active {
-		background-color: $green-color-alt;
-	}
-
-	.dropdown-item:focus,
-	.dropdown-item:hover {
-		background-color: $green-color;
-	}
-</style>

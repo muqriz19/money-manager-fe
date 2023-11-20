@@ -1,4 +1,6 @@
 import { goto } from "$app/navigation";
+import type { StorageItems } from "$lib/data/core";
+import ToastStore from "../../stores/ToastStore";
 import Modal from '../components/Modal.svelte';
 
 const ROOT_API = "http://localhost:5133/api/";
@@ -12,7 +14,11 @@ export enum HTTP_METHOD {
 
 export enum APIS {
     ACCOUNTS = "Accounts",
-    CATEGORIES = "Categories"
+    CATEGORIES = "Categories",
+    REGISTER = "Authorization/Register",
+    Login = "Authorization/Login",
+    FORGOT_PASSWORD = "Authorization/ForgotPassword",
+    RESET_PASSWORD = "Authorization/ResetPassword"
 }
 
 export interface ResponseBody {
@@ -39,32 +45,37 @@ export function fetchData<T>(methods: HTTP_METHOD, apiRoutes: APIS | string, bod
 
     return fetch(finalPath, options)
         .then((resp) => {
-            console.log(resp);
+            const respJson = resp.json();
+            console.log('RESPONSE ', resp);
 
-            return resp.json();
+            if (!resp.ok) {
+                return Promise.reject(respJson);
+            }
+
+            return respJson;
         })
         .then((respBody: ResponseBody) => {
             console.log(respBody);
-
-            catchResponseErrors(respBody);
-
             return respBody;
+        }).catch(async err => {
+            const respData = await err;
+
+            if (respData && respData.status === 401) {
+                unauthorizedRequest();
+            }
+
+            throw respData;
         });
 }
 
-export function catchResponseErrors(resp: any) {
-    if (resp.status === 400 || resp.status === 409 || resp.status === 404) {
-        if (resp.message) {
-            throw new Error(resp.message);
-        } else {
-            if (resp.statusText) {
-                throw new Error(resp.statusText);
-            }
-        }
+function unauthorizedRequest() {
+    ToastStore.set({
+        title: 'Unauthorized Login',
+        message: "Please login to use the application",
+        type: 'error'
+    });
 
-        throw new Error('Error in fetching data...');
-
-    }
+    navigateTo('/login');
 }
 
 let timeout: NodeJS.Timeout | null = null;
@@ -79,7 +90,7 @@ export function debounce(milliSeconds: number, functionCode: Function) {
     }, milliSeconds);
 }
 
-export function saveData(data: any, key: string) {
+export function saveData(data: any, key: StorageItems) {
     if (typeof data === 'object') {
         sessionStorage.setItem(key, JSON.stringify(data));
     } else {
@@ -87,7 +98,7 @@ export function saveData(data: any, key: string) {
     }
 }
 
-export function getData(key: string) {
+export function getData(key: StorageItems) {
     let data = sessionStorage.getItem(key);
 
     if (data?.indexOf('[') || data?.indexOf('{')) {
@@ -109,4 +120,8 @@ export function confirmAction(options: any) {
             modal.$destroy();
         });
     })
+}
+
+export function clearStorage() {
+    sessionStorage.clear();
 }

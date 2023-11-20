@@ -1,3 +1,13 @@
+@font-face {
+    font-family: myFirstFont;
+    src: url('../styles/exo_2/static/Exo2-Regular.ttf');
+}
+
+* {
+    font-family: myFirstFont;
+    font-size: 100%;
+}
+
 .mm-btn {
     border: 1px solid $green-color;
     background-color: $green-color;
@@ -24,12 +34,12 @@
     }
 }
 
-.mini-fab {
+.fab {
     position: absolute;
     top: -5px;
     right: -5px;
     height: 16px;
-    border: 1px solid black;
+    border: 1px solid $grey-color;
     border-radius: 360px;
     width: 16px;
     background-color: $white-color;
@@ -78,6 +88,10 @@ i[data-icon-set*=bootstrapIcons].iconSet {
     @include iconSetStandard();
 }
 
+.page {
+    margin-top: 1rem;
+}
+
 // override active buttons
 .btn:first-child:active {
     background-color: $green-color-alt;
@@ -96,4 +110,14 @@ i[data-icon-set*=bootstrapIcons].iconSet {
 .btn:disabled {
     background-color: $green-color;
     border: 1px solid $green-color-alt;
+}
+
+.dropdown-item.active,
+.dropdown-item:active {
+    background-color: $green-color-alt;
+}
+
+.dropdown-item:focus,
+.dropdown-item:hover {
+    background-color: $green-color;
 }

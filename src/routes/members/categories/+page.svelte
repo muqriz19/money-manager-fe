@@ -12,7 +12,7 @@
 		navigateTo,
 		saveData
 	} from '$lib/helpers/utils';
-	import ToastStore from '../../stores/ToastStore';
+	import ToastStore from '../../../stores/ToastStore';
 
 	let allTableHeaders: TableHeader[] = [
 		{
@@ -85,18 +85,13 @@
 			]
 		},
 		actions: {
-			has: { edit: true, delete: true, view: true },
+			has: { edit: true, delete: true, view: false },
 
 			methods: {
-				viewRow: (rowData: any) => {
-					const id = rowData.id;
-
-					navigateTo('categories/view/' + id);
-				},
 				editRow: (rowData: any) => {
 					saveData(rowData, StorageItems.Categories);
 
-					navigateTo('categories/edit');
+					navigateTo('members/categories/edit');
 				},
 				delete: {
 					deleteRow: async (rowData: any) => {

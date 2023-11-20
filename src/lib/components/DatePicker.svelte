@@ -18,7 +18,6 @@
 			locale: defaultLocale,
 
             onSelect: (date) => {
-                console.log(date);
             }
 		})
 	}

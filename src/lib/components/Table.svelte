@@ -54,8 +54,6 @@
 	let ids: number[] = [];
 
 	onMount(() => {
-		console.log('Table Config', tableConfig);
-
 		setup();
 	});
 

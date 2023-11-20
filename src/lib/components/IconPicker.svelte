@@ -2,13 +2,13 @@
 	import type { IconSet, SelectedIcon } from '$lib/data/core';
 	import { debounce } from '$lib/helpers/utils';
 	import * as bootsrapIcons from 'bootstrap-icons/font/bootstrap-icons.json';
-	import { createEventDispatcher } from 'svelte';
+	import { createEventDispatcher, onMount } from 'svelte';
 
-	const iconList: IconSet[] = [];
+	let iconList: IconSet[] = [];
 
 	let currentIconSet: IconSet | null = null;
 	let currentIcons: string[] = [];
-	let originalRefenceIcons: string[] = [];
+	let originalReferenceIcons: string[] = [];
 	let searchQuery = '';
 	export let selectedIcon: SelectedIcon | null = null;
 
@@ -17,7 +17,20 @@
 
 	export const dispatch = createEventDispatcher();
 
+	let dropdownInputRef: HTMLSelectElement;
+
+	onMount(() => {
+		initIconset();
+	});
+
 	function initIconset() {
+		iconList = [];
+		currentIconSet = null;
+		currentIcons = [];
+		originalReferenceIcons = [];
+		selectedIcon = null;
+		dropdownInputRef.value = '';
+
 		// default null
 		const nullSet: IconSet = {
 			name: 'Select an Iconset',
@@ -55,7 +68,6 @@
 		iconList.push(iconSetBootstrap);
 	}
 
-	initIconset();
 
 	function onSelectedIconSet($event: any) {
 		const value = $event.target.value;
@@ -71,7 +83,7 @@
 				currentIconSet = currentSet;
 
 				currentIcons = currentIconSet.icons;
-				originalRefenceIcons = currentIconSet.icons;
+				originalReferenceIcons = currentIconSet.icons;
 			}
 		}
 	}
@@ -82,7 +94,7 @@
 
 			if (currentIconSet) {
 				if (currentIconSet.set === 'bootstrapIcons') {
-					const foundIcons = originalRefenceIcons.filter((ref) => {
+					const foundIcons = originalReferenceIcons.filter((ref) => {
 						return ref.toLowerCase().includes(query);
 					});
 
@@ -138,7 +150,7 @@
 					{/if}
 
 					{#if selectedIcon}
-						<button type="button" class="mini-fab" on:click={clearSelectionIcon}>
+						<button type="button" class="fab" on:click={clearSelectionIcon}>
 							<i class="bi bi-x" />
 						</button>
 					{/if}
@@ -158,8 +170,9 @@
 
 			<div class="col-4">
 				<select
+					bind:this={dropdownInputRef}
 					class="form-select"
-					aria-label="Default select example"
+					aria-label="Select Icon"
 					on:change={onSelectedIconSet}
 				>
 					{#each iconList as set}
@@ -232,6 +245,8 @@
 		.middle {
 			display: grid;
 			margin-top: 1rem;
+
+			justify-content: center;
 
 			grid-template-columns: repeat(auto-fit, minmax(64px, 64px));
 			gap: 10px;
