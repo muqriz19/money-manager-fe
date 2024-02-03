@@ -4,8 +4,8 @@
 	import { StorageItems, type SelectedIcon } from '$lib/data/core';
 	import IconPicker from '$lib/components/IconPicker.svelte';
 	import type { Category, ProfileData } from '$lib/data/data';
-	import ToastStore from '../../../../stores/ToastStore.js';
-	import ProfileStore from '../../../../stores/ProfileStore.js';
+	import ToastStore from '../../../../../../stores/ToastStore.js';
+	import ProfileStore from '../../../../../../stores/ProfileStore.js';
 
 	export let data;
 	let mode = data.mode;

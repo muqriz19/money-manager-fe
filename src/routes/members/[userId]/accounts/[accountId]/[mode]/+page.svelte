@@ -2,9 +2,9 @@
 	import { APIS, HTTP_METHOD, fetchData, getData } from '$lib/helpers/utils';
 	import { onMount } from 'svelte';
 	import { StorageItems } from '$lib/data/core';
-	import type { ProfileData, Record } from '$lib/data/data';
-	import ProfileStore from '../../../../../../../stores/ProfileStore.js';
-	import ToastStore from '../../../../../../../stores/ToastStore.js';
+	import type { Account, ProfileData } from '$lib/data/data';
+	import ProfileStore from '../../../../../../stores/ProfileStore.js';
+	import ToastStore from '../../../../../../stores/ToastStore.js';
 
 	export let data;
 	let mode = data.mode;
@@ -16,8 +16,7 @@
 		name: null,
 		description: null,
 		createdDate: null || new Date(),
-		userId: 0,
-		accountId: 0
+		userId: 0
 	};
 
 	let validationErrors = {
@@ -42,14 +41,12 @@
 		});
 
 		if (mode === 'edit') {
-			let data = getData(StorageItems.Records);
+			let account = getData(StorageItems.Accounts);
 
-			form.id = data.id;
-			form.name = data.name;
-			form.description = data.description;
+			form.id = account.id;
+			form.name = account.name;
+			form.description = account.description;
 		}
-
-		form.accountId = Number(data.accountId);
 
 		validateForm();
 	}
@@ -72,13 +69,12 @@
 		const createdDate = mode === 'new' ? new Date() : form.createdDate;
 		const description = form.description === '' ? null : form.description;
 
-		const finalForm: Record = {
+		const finalForm: Account = {
 			id: form.id,
 			name: form.name!,
 			description,
 			createdDate,
-			userId: form.userId,
-			accountId: form.accountId
+			userId: form.userId
 		};
 
 		return finalForm;
@@ -88,10 +84,10 @@
 		const finalForm = returnFinalFormData();
 
 		if (mode === 'new') {
-			fetchData<Record>(HTTP_METHOD.POST, APIS.RECORDS, finalForm)
+			fetchData<Account>(HTTP_METHOD.POST, APIS.ACCOUNTS, finalForm)
 				.then((resp) => {
 					ToastStore.set({
-						title: 'Created Record',
+						title: 'Created Account',
 						message: resp.message,
 						type: 'success'
 					});
@@ -106,10 +102,10 @@
 					});
 				});
 		} else {
-			fetchData<Record>(HTTP_METHOD.PUT, APIS.RECORDS, finalForm)
+			fetchData<Account>(HTTP_METHOD.PUT, APIS.ACCOUNTS, finalForm)
 				.then((resp) => {
 					ToastStore.set({
-						title: 'Updated Record',
+						title: 'Updated Account',
 						message: resp.message,
 						type: 'success'
 					});
@@ -130,8 +126,7 @@
 			name: null,
 			description: null,
 			createdDate: null || new Date(),
-			userId: userProfile!.userId,
-			accountId: Number(data.accountId)
+			userId: userProfile!.userId
 		};
 
 		validationErrors = {
@@ -148,11 +143,11 @@
 
 <div class="page">
 	{#if mode === 'new'}
-		<h1>New Record</h1>
-		<p>Create your record</p>
+		<h1>New Account</h1>
+		<p>Create your account</p>
 	{:else}
-		<h1>Edit Record</h1>
-		<p>Edit your record</p>
+		<h1>Edit Account</h1>
+		<p>Edit your account</p>
 	{/if}
 
 	<form class="form-container" on:submit|preventDefault={onSubmit}>

@@ -14,8 +14,8 @@
 		saveData
 	} from '$lib/helpers/utils';
 	import { onMount } from 'svelte';
-	import ToastStore from '../../../stores/ToastStore';
-	import ProfileStore from '../../../stores/ProfileStore';
+	import ProfileStore from '../../../../stores/ProfileStore';
+	import ToastStore from '../../../../stores/ToastStore';
 
 	let profileDetail: ProfileData | null = null;
 
@@ -128,7 +128,7 @@
 							editRow: (rowData: any) => {
 								saveData(rowData, StorageItems.Categories);
 
-								navigateTo('/members/categories/edit');
+								navigateTo(`/members/${profileDetail?.userId}/categories/${rowData.id}/edit`);
 							},
 							delete: {
 								deleteRow: async (rowData: any) => {
@@ -182,7 +182,7 @@
 				<button
 					type="button"
 					class="btn btn-primary"
-					on:click={() => navigateTo('/members/categories/new')}>New</button
+					on:click={() => navigateTo(`/members/${profileDetail?.userId}/categories/0/new`)}>New</button
 				>
 			</div>
 		</div>

@@ -6,43 +6,12 @@
 	import AppProfileAvatar from './AppProfileAvatar.svelte';
 	import { onDestroy, onMount } from 'svelte';
 	import ProfileStore from '../../stores/ProfileStore';
+	import type { ProfileData } from '$lib/data/data';
 
 	let currentRoute: string = '';
+	let currentProfileData: ProfileData;
 
-	const allRoutes: RouteItem[] = [
-		{
-			path: '/',
-			name: 'Home'
-		},
-		{
-			path: 'members/accounts',
-			name: 'Accounts',
-			children: [
-				{
-					path: '/members/accounts',
-					name: 'All'
-				},
-				{
-					path: '/members/accounts/new',
-					name: 'New'
-				}
-			]
-		},
-		{
-			path: 'members/categories',
-			name: 'Categories',
-			children: [
-				{
-					path: '/members/categories',
-					name: 'All'
-				},
-				{
-					path: '/members/categories/new',
-					name: 'New'
-				}
-			]
-		}
-	];
+	let allRoutes: RouteItem[] = [];
 
 	let allowedRoutes: RouteItem[] = [];
 
@@ -53,12 +22,54 @@
 	function init() {
 		ProfileStore.subscribe((profileData) => {
 			if (profileData && profileData.token !== '') {
+				currentProfileData = profileData;
+
+				initRoute(currentProfileData.userId);
+
 				// filtered allowed
 				allowedRoutes = allRoutes;
 			} else {
+				initRoute(-1);
 				allowedRoutes = [allRoutes[0]];
 			}
 		});
+	}
+
+	function initRoute(userId: number) {
+		allRoutes = [
+			{
+				path: '/',
+				name: 'Home'
+			},
+			{
+				path: '/members',
+				name: 'Accounts',
+				children: [
+					{
+						path: `/members/${userId}/accounts`,
+						name: 'All'
+					},
+					{
+						path: `/members/${userId}/accounts/0/new`,
+						name: 'New'
+					}
+				]
+			},
+			{
+				path: '/members',
+				name: 'Categories',
+				children: [
+					{
+						path: `/members/${userId}/categories`,
+						name: 'All'
+					},
+					{
+						path: `/members/${userId}/categories/0/new`,
+						name: 'New'
+					}
+				]
+			}
+		];
 	}
 
 	function getCurrentRoute(path: string) {

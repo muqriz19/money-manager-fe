@@ -96,6 +96,35 @@ i[data-icon-set*=bootstrapIcons].iconSet {
     margin-top: 1rem;
 }
 
+@mixin borderStyle {
+    border-radius: 5px;
+    border: 1px solid $grey-color;
+}
+
+@mixin defaultStyle {
+    padding: 1rem;
+}
+
+.page-container {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+
+    .top {
+        @include defaultStyle();
+        @include borderStyle();
+
+        .meta {
+            text-align: end;
+        }
+    }
+
+    .middle {
+        @include defaultStyle();
+        @include borderStyle();
+    }
+}
+
 // override active buttons
 .btn:first-child:active {
     background-color: $green-color-alt;

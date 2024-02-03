@@ -1,9 +1,9 @@
 <script lang="ts">
 	import { onDestroy, onMount } from 'svelte';
-	import ProfileStore from '../../../stores/ProfileStore';
 	import ProfileDetails from '$lib/components/ProfileDetails.svelte';
 	import type { ProfileData } from '$lib/data/data';
 	import type { Unsubscriber } from 'svelte/store';
+	import ProfileStore from '../../../../stores/ProfileStore';
 
 	let currentProfileData: ProfileData | null = null;
 	let unSubscribe: Unsubscriber;

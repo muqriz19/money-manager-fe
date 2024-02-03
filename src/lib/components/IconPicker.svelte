@@ -170,9 +170,6 @@
 		clearAnyIcons();
 		selectedIcon = null;
 
-
-		console.log(currentIconSet);
-
 		if (currentIconSet) {
 			selectedIcon = {
 				set: currentIconSet?.set,
@@ -212,10 +209,7 @@
 	}
 
 	function clearAnyIcons() {
-		console.log(selectedIcon)
 		const container = document.querySelector('.box');
-
-		console.dir(container);
 
 		if (container) {
 			for (let c = 0; c < container!.children.length; c++) {
@@ -228,7 +222,7 @@
 </script>
 
 <div class="icon-picker-container">
-	<div class="top">
+	<div class="top-section">
 		<div class="row">
 			<div class="col-1 iconSelected">
 				<div class="box position-relative">
@@ -318,7 +312,7 @@
 
 <style lang="scss">
 	.icon-picker-container {
-		.top {
+		.top-section {
 			.iconSelected {
 				.box {
 					border: 1px solid $grey-color;

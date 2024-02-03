@@ -1,54 +1,44 @@
 <script lang="ts">
+	import Confirmation from '$lib/components/Confirmation.svelte';
 	import Table from '$lib/components/Table.svelte';
 	import { StorageItems } from '$lib/data/core';
-	import type { Account, ProfileData } from '$lib/data/data';
+	import type { ModalConfig } from '$lib/data/modal';
 	import type { TableConfig, TableHeader } from '$lib/data/table';
 	import {
 		APIS,
 		HTTP_METHOD,
 		confirmAction,
 		fetchData,
-		getData,
 		navigateTo,
 		saveData
 	} from '$lib/helpers/utils';
 	import { onMount } from 'svelte';
-	import ProfileStore from '../../../../../stores/ProfileStore';
-	import ToastStore from '../../../../../stores/ToastStore';
-	import Confirmation from '$lib/components/Confirmation.svelte';
-	import type { ModalConfig } from '$lib/data/modal';
+	import type { ProfileData } from '$lib/data/data';
+	import ProfileStore from '../../../../stores/ProfileStore';
+	import ToastStore from '../../../../stores/ToastStore';
 
-	export let data;
-
-	let account: Account | null = null;
 	let profileDetail: ProfileData | null = null;
 
-	let accountDetails = {
-		name: '',
-		description: <string | null>'',
-		createdDate: new Date()
-	};
-
-	let tableHeader: TableHeader[] = [
+	let accountTableHeaders: TableHeader[] = [
 		{
-			canSort: true,
 			name: 'Name',
+			canSort: true,
 			width: 'auto'
 		},
 		{
-			canSort: true,
 			name: 'Description',
+			canSort: true,
 			width: 'auto'
 		},
 		{
-			canSort: true,
 			name: 'Created Date',
+			canSort: true,
 			width: 'auto'
 		},
 		{
+			name: 'Action',
 			canSort: true,
-			name: 'Actions',
-			width: 'auto'
+			width: '12%'
 		}
 	];
 
@@ -62,30 +52,22 @@
 			}
 		},
 		head: {
-			title: 'Delete Record?'
+			title: 'Delete Account?'
 		},
 		body: {
 			component: Confirmation,
-			props: { message: 'You are about to delete this record, are you sure you want to do that?' }
+			props: { message: 'You are about to delete this account, are you sure you want to do that?' }
 		}
 	};
 
 	onMount(() => {
-		account = getData(StorageItems.Accounts);
-
-		if (account) {
-			accountDetails.name = account.name;
-			accountDetails.description = account.description;
-			accountDetails.createdDate = new Date(account.createdDate);
-		}
-
 		ProfileStore.subscribe((profile) => {
 			if (profile) {
 				profileDetail = profile;
 
 				tableConfig = {
 					api: {
-						path: APIS.RECORDS + '/' + profileDetail?.userId + '/' + data.id,
+						path: APIS.ACCOUNTS + '/' + profileDetail?.userId,
 						queries: [
 							{
 								queryName: 'pageNumber',
@@ -120,6 +102,7 @@
 								name: 'createdDate',
 								command: (row) => {
 									const date = new Date(row.createdDate).toDateString();
+
 									return date;
 								}
 							},
@@ -139,18 +122,19 @@
 						methods: {
 							viewRow: (rowData: any) => {
 								const id = rowData.id;
+								saveData(rowData, StorageItems.Accounts);
 
-								navigateTo('/members/accounts/records/view/' + id);
+								navigateTo(`/members/${profileDetail?.userId}/accounts/${id}`);
 							},
 							editRow: (rowData: any) => {
-								saveData(rowData, StorageItems.Records);
+								saveData(rowData, StorageItems.Accounts);
 
-								navigateTo(`/members/accounts/records/${data.id}/${rowData.id}/edit`);
+								navigateTo(`/members/${profileDetail?.userId}/accounts/${rowData.id}/edit`);
 							},
 							delete: {
 								deleteRow: async (rowData: any) => {
 									const id = rowData.id;
-									const path = APIS.RECORDS + '/' + id;
+									const path = APIS.ACCOUNTS + '/' + id;
 
 									const confirmed = await confirmAction({ modalConfig });
 
@@ -159,7 +143,7 @@
 											fetchData(HTTP_METHOD.DELETE, path, null)
 												.then((resp) => {
 													ToastStore.set({
-														message: 'Successful in deleting record',
+														message: 'Successful in deleting account',
 														title: 'Success',
 														type: 'success'
 													});
@@ -183,73 +167,30 @@
 						}
 					}
 				};
-
-				console.log(tableConfig);
 			}
 		});
 	});
 </script>
 
 <div class="page">
-	<div class="account-container">
-		<div class="top">
-			<div class="info">
-				<h1>{accountDetails.name}</h1>
-				<p>{accountDetails.description ?? ''}</p>
-			</div>
+	<div class="page-top">
+		<h1>Accounts</h1>
+	</div>
 
-			<div class="meta small-text">
-				<span>Created since: {accountDetails.createdDate.toDateString()}</span>
+	<div class="page-middle">
+		<div class="row">
+			<div class="col-sm-3 col-md-0 col-lg-1">
+				<button
+					type="button"
+					class="btn btn-primary"
+					on:click={() => navigateTo(`/members/${profileDetail?.userId}/accounts/0/new`)}
+					>New</button
+				>
 			</div>
 		</div>
 
-		<div class="middle">
-			<h3>All Records</h3>
-
-			<div class="row">
-				<div class="col-sm-3 col-md-0 col-lg-1">
-					<button
-						type="button"
-						class="btn btn-primary"
-						on:click={() => navigateTo('/members/accounts/records/' + data.id + '/' + 0 + '/new')}>New</button
-					>
-				</div>
-			</div>
-
-			<div class="mt-4">
-				<Table bind:tableHeaders={tableHeader} bind:tableConfig />
-			</div>
+		<div class="mt-4">
+			<Table bind:tableHeaders={accountTableHeaders} bind:tableConfig />
 		</div>
 	</div>
 </div>
-
-<style lang="scss">
-	@mixin borderStyle {
-		border-radius: 5px;
-		border: 1px solid $grey-color;
-	}
-
-	@mixin defaultStyle {
-		padding: 1rem;
-	}
-
-	.account-container {
-		display: flex;
-		flex-direction: column;
-		gap: 1rem;
-
-		.top {
-			@include defaultStyle();
-			@include borderStyle();
-
-			.meta {
-				text-align: end;
-			}
-		}
-
-		.middle {
-			@include defaultStyle();
-			@include borderStyle();
-		}
-	}
-</style>

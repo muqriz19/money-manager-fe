@@ -83,7 +83,7 @@
 				ProfileStore.set(resp.data);
 
 				// navigate inside
-				navigateTo('/members/profile');
+				navigateTo(`/members/${resp.data.userId}/profile`);
 			})
 			.catch((err) => {
 				ToastStore.set({

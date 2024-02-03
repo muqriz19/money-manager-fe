@@ -1,44 +1,54 @@
 <script lang="ts">
-	import Confirmation from '$lib/components/Confirmation.svelte';
 	import Table from '$lib/components/Table.svelte';
 	import { StorageItems } from '$lib/data/core';
-	import type { ModalConfig } from '$lib/data/modal';
+	import type { Account, ProfileData } from '$lib/data/data';
 	import type { TableConfig, TableHeader } from '$lib/data/table';
 	import {
 		APIS,
 		HTTP_METHOD,
 		confirmAction,
 		fetchData,
+		getData,
 		navigateTo,
 		saveData
 	} from '$lib/helpers/utils';
 	import { onMount } from 'svelte';
-	import ToastStore from '../../../stores/ToastStore';
-	import type { ProfileData } from '$lib/data/data';
-	import ProfileStore from '../../../stores/ProfileStore';
+	import Confirmation from '$lib/components/Confirmation.svelte';
+	import type { ModalConfig } from '$lib/data/modal';
+	import ProfileStore from '../../../../../stores/ProfileStore.js';
+	import ToastStore from '../../../../../stores/ToastStore.js';
 
+	export let data;
+
+	let account: Account | null = null;
 	let profileDetail: ProfileData | null = null;
 
-	let accountTableHeaders: TableHeader[] = [
+	let accountDetails = {
+		name: '',
+		description: <string | null>'',
+		createdDate: new Date()
+	};
+
+	let tableHeader: TableHeader[] = [
 		{
+			canSort: true,
 			name: 'Name',
-			canSort: true,
 			width: 'auto'
 		},
 		{
+			canSort: true,
 			name: 'Description',
-			canSort: true,
 			width: 'auto'
 		},
 		{
+			canSort: true,
 			name: 'Created Date',
-			canSort: true,
 			width: 'auto'
 		},
 		{
-			name: 'Action',
 			canSort: true,
-			width: '12%'
+			name: 'Actions',
+			width: 'auto'
 		}
 	];
 
@@ -52,22 +62,30 @@
 			}
 		},
 		head: {
-			title: 'Delete Account?'
+			title: 'Delete Record?'
 		},
 		body: {
 			component: Confirmation,
-			props: { message: 'You are about to delete this account, are you sure you want to do that?' }
+			props: { message: 'You are about to delete this record, are you sure you want to do that?' }
 		}
 	};
 
 	onMount(() => {
+		account = getData(StorageItems.Accounts);
+
+		if (account) {
+			accountDetails.name = account.name;
+			accountDetails.description = account.description;
+			accountDetails.createdDate = new Date(account.createdDate);
+		}
+
 		ProfileStore.subscribe((profile) => {
 			if (profile) {
 				profileDetail = profile;
 
 				tableConfig = {
 					api: {
-						path: APIS.ACCOUNTS + '/' + profileDetail?.userId,
+						path: APIS.RECORDS + '/' + profileDetail?.userId + '/' + data.accountId,
 						queries: [
 							{
 								queryName: 'pageNumber',
@@ -102,7 +120,6 @@
 								name: 'createdDate',
 								command: (row) => {
 									const date = new Date(row.createdDate).toDateString();
-
 									return date;
 								}
 							},
@@ -122,19 +139,20 @@
 						methods: {
 							viewRow: (rowData: any) => {
 								const id = rowData.id;
-								saveData(rowData, StorageItems.Accounts);
 
-								navigateTo('/members/accounts/view/' + id);
+								navigateTo(`/members/${profileDetail?.userId}/accounts/${data.accountId}/records/${rowData.id}`);
 							},
 							editRow: (rowData: any) => {
-								saveData(rowData, StorageItems.Accounts);
+								saveData(rowData, StorageItems.Records);
 
-								navigateTo('/members/accounts/edit');
+								navigateTo(
+									`/members/${profileDetail?.userId}/accounts/${data.accountId}/records/${rowData.id}/edit`
+								);
 							},
 							delete: {
 								deleteRow: async (rowData: any) => {
 									const id = rowData.id;
-									const path = APIS.ACCOUNTS + '/' + id;
+									const path = APIS.RECORDS + '/' + id;
 
 									const confirmed = await confirmAction({ modalConfig });
 
@@ -143,7 +161,7 @@
 											fetchData(HTTP_METHOD.DELETE, path, null)
 												.then((resp) => {
 													ToastStore.set({
-														message: 'Successful in deleting account',
+														message: 'Successful in deleting record',
 														title: 'Success',
 														type: 'success'
 													});
@@ -167,31 +185,43 @@
 						}
 					}
 				};
-
-				console.log(tableConfig);
 			}
 		});
 	});
 </script>
 
 <div class="page">
-	<div class="page-top">
-		<h1>Accounts</h1>
-	</div>
+	<div class="account-container page-container">
+		<div class="top">
+			<div class="info">
+				<h1>{accountDetails.name}</h1>
+				<p>{accountDetails.description ?? ''}</p>
+			</div>
 
-	<div class="page-middle">
-		<div class="row">
-			<div class="col-sm-3 col-md-0 col-lg-1">
-				<button
-					type="button"
-					class="btn btn-primary"
-					on:click={() => navigateTo('/members/accounts/new')}>New</button
-				>
+			<div class="meta small-text">
+				<span>Created since: {accountDetails.createdDate.toDateString()}</span>
 			</div>
 		</div>
 
-		<div class="mt-4">
-			<Table bind:tableHeaders={accountTableHeaders} bind:tableConfig />
+		<div class="middle">
+			<h3>All Records</h3>
+
+			<div class="row">
+				<div class="col-sm-3 col-md-0 col-lg-1">
+					<button
+						type="button"
+						class="btn btn-primary"
+						on:click={() =>
+							navigateTo(
+								`/members/${profileDetail?.userId}/accounts/${data.accountId}/records/0/new`
+							)}>New</button
+					>
+				</div>
+			</div>
+
+			<div class="mt-4">
+				<Table bind:tableHeaders={tableHeader} bind:tableConfig />
+			</div>
 		</div>
 	</div>
 </div>
