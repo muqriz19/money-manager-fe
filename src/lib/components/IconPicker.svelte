@@ -159,29 +159,28 @@
 					currentIcons = currentIconSet.icons;
 				}
 
-				if (currentIconSet.set === 'lucideIcons') {
-					createLucideIcons();
-				}
+				activateLucideIcons();
 			}
 		});
 	}
 
 	function selectTheIcon(onSelectedIcon: string) {
 		clearAnyIcons();
+
 		selectedIcon = null;
 
-		if (currentIconSet) {
-			selectedIcon = {
-				set: currentIconSet?.set,
-				name: onSelectedIcon
-			};
+		setTimeout(() => {
+			if (currentIconSet) {
+				selectedIcon = {
+					set: currentIconSet?.set,
+					name: onSelectedIcon
+				};
 
-			if (currentIconSet.set === "lucideIcons") {
-				createLucideIcons();
+				activateLucideIcons();
+
+				dispatch('iconChanged', selectedIcon);
 			}
-
-			dispatch('iconChanged', selectedIcon);
-		}
+		}, 0);
 
 		return null;
 	}
@@ -200,12 +199,20 @@
 
 	function toggleViewIconList() {
 		hasListHidden = !hasListHidden;
+
+		activateLucideIcons();
 	}
 
 	function createLucideIcons() {
 		setTimeout(() => {
 			createIcons({ icons: lucideIcons });
 		}, 0);
+	}
+
+	function activateLucideIcons() {
+		if (currentIconSet && currentIconSet.set === 'lucideIcons') {
+			createLucideIcons();
+		}
 	}
 
 	function clearAnyIcons() {
@@ -234,8 +241,6 @@
 						{#if selectedIcon?.set === 'lucideIcons'}
 							<i data-lucide={selectedIcon?.name} class="iconSet" title={selectedIcon?.set} />
 						{/if}
-					{:else}
-						<span>N/A</span>
 					{/if}
 
 					{#if selectedIcon}
