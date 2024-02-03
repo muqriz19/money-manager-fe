@@ -1,6 +1,6 @@
 <script lang="ts">
 	import type { User } from '$lib/data/data';
-	import { APIS, HTTP_METHOD, fetchData } from '$lib/helpers/utils';
+	import { APIS, HTTP_METHOD, fetchData, navigateTo } from '$lib/helpers/utils';
 	import { onMount } from 'svelte';
 	import ToastStore from '../../stores/ToastStore';
 
@@ -107,6 +107,8 @@
 					message: resp.message,
 					type: 'success'
 				});
+
+				navigateTo('/login');
 			})
 			.catch((err) => {
 				ToastStore.set({

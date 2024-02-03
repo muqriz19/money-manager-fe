@@ -9,15 +9,15 @@
 }
 
 .mm-btn {
-    border: 1px solid $green-color;
-    background-color: $green-color;
+    border: 1px solid $green-color-alt;
+    background-color: $green-color-alt;
     color: $white-color;
 
     border-radius: 5px;
 }
 
 .mm-btn:hover {
-    background-color: $green-color-alt;
+    background-color: $green-color;
 }
 
 .icon {
@@ -25,7 +25,7 @@
 }
 
 .btn {
-    background-color: $green-color;
+    background-color: $green-color-alt;
     border: 1px solid $green-color-alt;
 
     &:hover {
@@ -59,6 +59,10 @@
     i {
         font-size: 14px;
     }
+}
+
+.small-text {
+    font-size: 10px;
 }
 
 @mixin iconSetStandard {
@@ -120,4 +124,8 @@ i[data-icon-set*=bootstrapIcons].iconSet {
 .dropdown-item:focus,
 .dropdown-item:hover {
     background-color: $green-color;
+}
+
+.form-control:focus {
+    box-shadow: 0 0 0 .25rem $green-color;
 }

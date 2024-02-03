@@ -1,11 +1,10 @@
 <script lang="ts">
 	import type { DataProp, TableAPIQuery, TableConfig, TableHeader } from '$lib/data/table';
 	import { HTTP_METHOD, debounce, fetchData } from '$lib/helpers/utils';
-	import { onMount } from 'svelte';
-	import Page from '../../routes/+page.svelte';
+	import Spinner from './Spinner.svelte';
 
 	export let tableHeaders: TableHeader[] = [];
-	export let tableConfig: TableConfig = {
+	export let tableConfig: TableConfig | null = {
 		api: {
 			path: '',
 			queries: [],
@@ -53,11 +52,13 @@
 
 	let ids: number[] = [];
 
-	onMount(() => {
-		setup();
-	});
+	$: tableConfig && setup();
 
 	const setup = () => {
+		if (!tableConfig) {
+			return;
+		}
+
 		// setup
 		rootAPI = tableConfig.api.path;
 		queries = tableConfig.api.queries;
@@ -85,6 +86,10 @@
 		isLoadingData = true;
 
 		fetchData(HTTP_METHOD.GET, apiPath, null).then((resp) => {
+			if (!tableConfig) {
+				return;
+			}
+
 			try {
 				// errors first
 				if (resp && !resp.hasOwnProperty(respDataProp)) {
@@ -151,12 +156,12 @@
 			tempData.forEach((data) => {
 				data = Object.assign(data, {
 					actions: {
-						...tableConfig.actions.has
+						...tableConfig!.actions.has
 					}
 				});
 
-				if (tableConfig.actions.methods) {
-					data.actions = Object.assign(data.actions, { ...tableConfig.actions.methods });
+				if (tableConfig!.actions.methods) {
+					data.actions = Object.assign(data.actions, { ...tableConfig!.actions.methods });
 				}
 			});
 		}
@@ -193,6 +198,10 @@
 	};
 
 	const paginate = (selectedPageNumber: number) => {
+		if (!tableConfig) {
+			return;
+		}
+
 		selectedPagination = selectedPageNumber;
 
 		// set up query
@@ -227,6 +236,10 @@
 	};
 
 	const onSearch = ($event: any) => {
+		if (!tableConfig) {
+			return;
+		}
+
 		debounce(1000, () => {
 			isLoadingData = true;
 
@@ -310,6 +323,13 @@
 			return null;
 		}
 	};
+
+	const cleanTableData = (data: any) => {
+		delete data.actions;
+		delete data.elementRef;
+
+		return data;
+	};
 </script>
 
 <div class="table-container">
@@ -365,7 +385,7 @@
 														<button
 															type="button"
 															class="mm-btn"
-															on:click={data[prop.name].viewRow(data)}
+															on:click={data[prop.name].viewRow(cleanTableData(data))}
 														>
 															<i class="bi bi-eye" />
 														</button>
@@ -421,7 +441,9 @@
 						<span>No data found...</span>
 					{/if}
 				{:else}
-					<span>Loading...</span>
+					<tr class="loader-container">
+						<Spinner />
+					</tr>
 				{/if}
 			</tbody>
 		</table>
@@ -484,7 +506,7 @@
 			}
 
 			.pagination-button.active {
-				background-color: $green-color;
+				background-color: $green-color-alt;
 				color: $white-color;
 			}
 		}

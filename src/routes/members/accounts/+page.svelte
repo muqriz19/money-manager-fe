@@ -12,7 +12,12 @@
 		navigateTo,
 		saveData
 	} from '$lib/helpers/utils';
+	import { onMount } from 'svelte';
 	import ToastStore from '../../../stores/ToastStore';
+	import type { ProfileData } from '$lib/data/data';
+	import ProfileStore from '../../../stores/ProfileStore';
+
+	let profileDetail: ProfileData | null = null;
 
 	let accountTableHeaders: TableHeader[] = [
 		{
@@ -37,107 +42,7 @@
 		}
 	];
 
-	let tableConfig: TableConfig = {
-		api: {
-			path: APIS.ACCOUNTS,
-			queries: [
-				{
-					queryName: 'pageNumber',
-					queryValue: '1'
-				},
-				{
-					queryName: 'pageSize',
-					queryValue: '10'
-				}
-			],
-			search: {
-				query: {
-					queryName: 'search',
-					queryValue: ''
-				}
-			}
-		},
-		dataHandle: {
-			pageCount: 10,
-			property: 'data',
-			dataProps: [
-				{
-					name: 'name'
-				},
-				{
-					name: 'description',
-					command: (row) => {
-						return row.description ? row.description : '';
-					}
-				},
-				{
-					name: 'createdDate',
-					command: (row) => {
-						const date = new Date(row.createdDate).toDateString();
-
-						return date;
-					}
-				},
-				{
-					name: 'actions'
-				}
-			],
-
-			refTotal: 'total'
-		},
-		actions: {
-			has: {
-				edit: true,
-				delete: true,
-				view: true
-			},
-			methods: {
-				viewRow: (rowData: any) => {
-					const id = rowData.id;
-
-					navigateTo('accounts/view/' + id);
-				},
-				editRow: (rowData: any) => {
-					saveData(rowData, StorageItems.Accounts);
-
-					navigateTo('accounts/edit');
-				},
-				delete: {
-					deleteRow: async (rowData: any) => {
-						const id = rowData.id;
-						const path = APIS.ACCOUNTS + '/' + id;
-
-						const confirmed = await confirmAction({ modalConfig });
-
-						if (confirmed) {
-							return new Promise((resolve) => {
-								fetchData(HTTP_METHOD.DELETE, path, null)
-									.then((resp) => {
-										ToastStore.set({
-											message: 'Successful in deleting account',
-											title: 'Success',
-											type: 'success'
-										});
-
-										resolve(true);
-									})
-									.catch((err) => {
-										ToastStore.set({
-											message: err,
-											title: 'Error occured',
-											type: 'error'
-										});
-
-										resolve(false);
-									});
-							});
-						}
-					},
-					refresh: true
-				}
-			}
-		}
-	};
+	let tableConfig: TableConfig | null = null;
 
 	let modalConfig: ModalConfig = {
 		foot: {
@@ -154,6 +59,119 @@
 			props: { message: 'You are about to delete this account, are you sure you want to do that?' }
 		}
 	};
+
+	onMount(() => {
+		ProfileStore.subscribe((profile) => {
+			if (profile) {
+				profileDetail = profile;
+
+				tableConfig = {
+					api: {
+						path: APIS.ACCOUNTS + '/' + profileDetail?.userId,
+						queries: [
+							{
+								queryName: 'pageNumber',
+								queryValue: '1'
+							},
+							{
+								queryName: 'pageSize',
+								queryValue: '10'
+							}
+						],
+						search: {
+							query: {
+								queryName: 'search',
+								queryValue: ''
+							}
+						}
+					},
+					dataHandle: {
+						pageCount: 10,
+						property: 'data',
+						dataProps: [
+							{
+								name: 'name'
+							},
+							{
+								name: 'description',
+								command: (row) => {
+									return row.description ? row.description : '';
+								}
+							},
+							{
+								name: 'createdDate',
+								command: (row) => {
+									const date = new Date(row.createdDate).toDateString();
+
+									return date;
+								}
+							},
+							{
+								name: 'actions'
+							}
+						],
+
+						refTotal: 'total'
+					},
+					actions: {
+						has: {
+							edit: true,
+							delete: true,
+							view: true
+						},
+						methods: {
+							viewRow: (rowData: any) => {
+								const id = rowData.id;
+								saveData(rowData, StorageItems.Accounts);
+
+								navigateTo('/members/accounts/view/' + id);
+							},
+							editRow: (rowData: any) => {
+								saveData(rowData, StorageItems.Accounts);
+
+								navigateTo('/members/accounts/edit');
+							},
+							delete: {
+								deleteRow: async (rowData: any) => {
+									const id = rowData.id;
+									const path = APIS.ACCOUNTS + '/' + id;
+
+									const confirmed = await confirmAction({ modalConfig });
+
+									if (confirmed) {
+										return new Promise((resolve) => {
+											fetchData(HTTP_METHOD.DELETE, path, null)
+												.then((resp) => {
+													ToastStore.set({
+														message: 'Successful in deleting account',
+														title: 'Success',
+														type: 'success'
+													});
+
+													resolve(true);
+												})
+												.catch((err) => {
+													ToastStore.set({
+														message: err,
+														title: 'Error occured',
+														type: 'error'
+													});
+
+													resolve(false);
+												});
+										});
+									}
+								},
+								refresh: true
+							}
+						}
+					}
+				};
+
+				console.log(tableConfig);
+			}
+		});
+	});
 </script>
 
 <div class="page">
@@ -164,8 +182,10 @@
 	<div class="page-middle">
 		<div class="row">
 			<div class="col-sm-3 col-md-0 col-lg-1">
-				<button type="button" class="btn btn-primary" on:click={() => navigateTo('members/accounts/new')}
-					>New</button
+				<button
+					type="button"
+					class="btn btn-primary"
+					on:click={() => navigateTo('/members/accounts/new')}>New</button
 				>
 			</div>
 		</div>

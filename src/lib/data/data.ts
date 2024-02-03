@@ -3,6 +3,7 @@ export interface Account {
     name: string;
     description: string | null;
     createdDate: Date;
+    userId: number;
 }
 
 export interface Category {
@@ -12,6 +13,7 @@ export interface Category {
     createdDate: Date;
     iconName: string;
     iconSet: string;
+    userId: number;
 }
 
 export interface User {
@@ -23,7 +25,7 @@ export interface User {
 }
 
 export interface Login {
-    name: string;
+    email: string;
     password: string;
 }
 
@@ -41,4 +43,17 @@ export interface ProfileData {
     name: string;
     token: string;
     createdDate: string;
+    userId: number;
 }
+
+export interface Record {
+    id: number;
+    name: string;
+    description: string | null;
+    createdDate: Date;
+    userId: number;
+    accountId: number;
+    logs?: []
+}
+
+export type LoaderType = 'regular';

@@ -7,12 +7,12 @@
 	import { StorageItems } from '$lib/data/core';
 
 	const form = {
-		name: null,
+		email: <string | null>null,
 		password: null
 	};
 
 	const validationErrors = {
-		name: {
+		email: {
 			message: ''
 		},
 		password: {
@@ -37,11 +37,17 @@
 	function validateForm() {
 		isValidForm = true;
 
-		if (!form.name || form.name === '') {
-			validationErrors.name.message = 'Name is required';
+		if (!form.email || form.email === '') {
+			validationErrors.email.message = 'Email is required';
 			isValidForm = false;
+		} else if (
+			form.email &&
+			!form.email.match(
+				/^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
+			)
+		) {
 		} else {
-			validationErrors.name.message = '';
+			validationErrors.email.message = '';
 		}
 
 		if (!form.password) {
@@ -54,7 +60,7 @@
 
 	function returnFinalFormData() {
 		const finalForm: Login = {
-			name: form.name!,
+			email: form.email!,
 			password: form.password!
 		};
 
@@ -73,11 +79,11 @@
 				});
 
 				// save profile data
-				ProfileStore.set(resp.data);
 				saveData(resp.data, StorageItems.Profile);
+				ProfileStore.set(resp.data);
 
 				// navigate inside
-				navigateTo('/profile');
+				navigateTo('/members/profile');
 			})
 			.catch((err) => {
 				ToastStore.set({
@@ -95,17 +101,17 @@
 
 	<form class="form-container" on:submit|preventDefault={onSubmit}>
 		<div class="mb-3">
-			<label for="name" class="form-label">Name</label>
+			<label for="name" class="form-label">Email</label>
 			<input
-				type="text"
+				type="email"
 				class="form-control"
-				id="name"
-				bind:value={form.name}
+				id="email"
+				bind:value={form.email}
 				on:input={() => validateForm()}
 			/>
 
-			{#if validationErrors.name.message}
-				<div class="alert alert-danger" role="alert">{validationErrors.name.message}</div>
+			{#if validationErrors.email.message}
+				<div class="alert alert-danger" role="alert">{validationErrors.email.message}</div>
 			{/if}
 		</div>
 

@@ -4,6 +4,7 @@
 	import { onMount } from 'svelte';
 	import ProfileStore from '../../stores/ProfileStore';
 	import type { RouteItem } from '$lib/data/core';
+	import type { ProfileData } from '$lib/data/data';
 
 	let randomId = 0;
 	let dropdown = {
@@ -14,7 +15,7 @@
 
 	const profileLinks: RouteItem[] = [
 		{
-			path: '/profile',
+			path: '/members/profile',
 			name: 'Profile'
 		},
 		{
@@ -25,12 +26,15 @@
 			path: '/login',
 			name: 'Logout',
 			command: ($event: any) => {
+				ProfileStore.set(null);
 				clearStorage();
 			}
 		}
 	];
 
 	let allAllowedLinks: RouteItem[] = [];
+
+	let currentProfileData: ProfileData;
 
 	onMount(() => {
 		init();
@@ -45,6 +49,7 @@
 
 		ProfileStore.subscribe((profileData) => {
 			if (profileData && profileData.token !== '') {
+				currentProfileData = profileData;
 				allAllowedLinks = profileLinks.filter((link) => link.name !== 'Login');
 			} else {
 				allAllowedLinks = profileLinks.filter(
@@ -74,7 +79,7 @@
 
 		const rectDropDown = dropDownElement?.getClientRects();
 
-		debounce(100, () => {
+		debounce(0, () => {
 			if (rectDropDown && rectDropDown.item(0)) {
 				const rectDropDownItem = rectDropDown.item(0)!;
 
@@ -103,6 +108,10 @@
 		data-list-id="list-{randomId}"
 		style="left: {dropdown.x}px; visibility: {dropdown.visible ? 'visible' : 'hidden'}"
 	>
+		{#if currentProfileData && currentProfileData?.name}
+			<li><a class="dropdown-item" href="#">Hello, {currentProfileData.name}</a></li>
+		{/if}
+
 		{#each allAllowedLinks as link}
 			{#if link?.command}
 				<li><a class="dropdown-item" href={link.path} on:click={link.command}>{link.name}</a></li>

@@ -11,20 +11,21 @@
 	import ToastStore from '../stores/ToastStore';
 	import type { ToastType } from 'svelte-toasts/types/common';
 	import type { Unsubscriber } from 'svelte/store';
-	import ProfileStore from '../stores/ProfileStore';
-	import { getData } from '$lib/helpers/utils';
-	import { StorageItems } from '$lib/data/core';
 
-	let _toastStoreRef: Unsubscriber;
+	let unsubscriber: Unsubscriber;
 
 	onMount(() => {
-		initStores();
-		
-		_toastStoreRef = ToastStore.subscribe((value) => {
+		unsubscriber = ToastStore.subscribe((value) => {
 			if (value) {
 				showToast(value.title, value.message, value.type);
 			}
 		});
+	});
+
+	onDestroy(() => {
+		if (unsubscriber) {
+			unsubscriber();
+		}
 	});
 
 	const showToast = (title: string, message: string, type: ToastType) => {
@@ -39,14 +40,6 @@
 			onRemove: () => {}
 		});
 	};
-
-	function initStores() {
-		const profileData = getData(StorageItems.Profile);
-
-		if (profileData) {
-			ProfileStore.set(profileData);
-		}
-	}
 </script>
 
 <Navbar />

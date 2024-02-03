@@ -1,7 +1,10 @@
 import { goto } from "$app/navigation";
-import type { StorageItems } from "$lib/data/core";
+import { StorageItems } from "$lib/data/core";
+import type { Writable } from "svelte/store";
+import ProfileStore from "../../stores/ProfileStore";
 import ToastStore from "../../stores/ToastStore";
 import Modal from '../components/Modal.svelte';
+import { browser } from "$app/environment";
 
 const ROOT_API = "http://localhost:5133/api/";
 
@@ -18,7 +21,8 @@ export enum APIS {
     REGISTER = "Authorization/Register",
     Login = "Authorization/Login",
     FORGOT_PASSWORD = "Authorization/ForgotPassword",
-    RESET_PASSWORD = "Authorization/ResetPassword"
+    RESET_PASSWORD = "Authorization/ResetPassword",
+    RECORDS = "Records"
 }
 
 export interface ResponseBody {
@@ -31,10 +35,20 @@ export function navigateTo(path: string) {
     goto(path);
 }
 
-export function fetchData<T>(methods: HTTP_METHOD, apiRoutes: APIS | string, bodyItem: T) {
+let globalStore: { [key: string]: Writable<any> } | null = null;
+
+export function fetchData<T>(method: HTTP_METHOD, apiRoutes: APIS | string, bodyItem: T) {
+    const headers = new Headers({ 'content-type': 'application/json' });
+
+    const profileData = getData(StorageItems.Profile);
+
+    if (profileData && profileData.token) {
+        headers.append('Authorization', `Bearer ${profileData.token}`);
+    }
+
     let options = {
-        method: methods,
-        headers: new Headers({ 'content-type': 'application/json' })
+        method: method,
+        headers: headers
     };
 
     let finalPath = `${ROOT_API}${apiRoutes}`;
@@ -45,20 +59,22 @@ export function fetchData<T>(methods: HTTP_METHOD, apiRoutes: APIS | string, bod
 
     return fetch(finalPath, options)
         .then((resp) => {
-            const respJson = resp.json();
             console.log('RESPONSE ', resp);
 
             if (!resp.ok) {
-                return Promise.reject(respJson);
+                return Promise.reject(resp);
             }
+
+            const respJson = resp.json();
 
             return respJson;
         })
         .then((respBody: ResponseBody) => {
-            console.log(respBody);
+            console.log('BODY ', respBody);
             return respBody;
         }).catch(async err => {
-            const respData = await err;
+            const respData = await err.json();
+            console.log('ERROR ', respData);
 
             if (respData && respData.status === 401) {
                 unauthorizedRequest();
@@ -75,7 +91,17 @@ function unauthorizedRequest() {
         type: 'error'
     });
 
+    clearStorage();
+
     navigateTo('/login');
+}
+
+export function initGlobalStores() {
+    globalStore = {
+        [Object.keys({ ProfileStore })[0]]: ProfileStore
+    };
+
+    return globalStore;
 }
 
 let timeout: NodeJS.Timeout | null = null;
@@ -98,14 +124,18 @@ export function saveData(data: any, key: StorageItems) {
     }
 }
 
-export function getData(key: StorageItems) {
-    let data = sessionStorage.getItem(key);
+export function getData(key: StorageItems) {   
+    let data = null;
+
+    data = sessionStorage.getItem(key);
 
     if (data?.indexOf('[') || data?.indexOf('{')) {
-        return JSON.parse(data);
+        data = JSON.parse(data);
     } else {
-        return data;
+        data = data;
     }
+
+    return data;
 }
 
 // Reference https://svelte.dev/repl/15d7c21aa036464cb0220af60dde3843?version=3.48.0

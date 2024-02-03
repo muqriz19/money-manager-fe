@@ -1,11 +1,10 @@
 <script lang="ts">
 	import { APIS, HTTP_METHOD, fetchData, getData } from '$lib/helpers/utils';
 	import { onMount } from 'svelte';
-	import { StorageItems, type SelectedIcon } from '$lib/data/core';
-	import IconPicker from '$lib/components/IconPicker.svelte';
-	import type { Category, ProfileData } from '$lib/data/data';
-	import ToastStore from '../../../../stores/ToastStore.js';
-	import ProfileStore from '../../../../stores/ProfileStore.js';
+	import { StorageItems } from '$lib/data/core';
+	import type { ProfileData, Record } from '$lib/data/data';
+	import ProfileStore from '../../../../../../../stores/ProfileStore.js';
+	import ToastStore from '../../../../../../../stores/ToastStore.js';
 
 	export let data;
 	let mode = data.mode;
@@ -14,18 +13,15 @@
 
 	let form = {
 		id: 0,
-		name: <string | null>null,
-		description: <string | null>null,
-		icon: <SelectedIcon | null>null,
-		createdDate: new Date(),
-		userId: 0
+		name: null,
+		description: null,
+		createdDate: null || new Date(),
+		userId: 0,
+		accountId: 0
 	};
 
 	let validationErrors = {
 		name: {
-			message: ''
-		},
-		icon: {
 			message: ''
 		}
 	};
@@ -46,16 +42,14 @@
 		});
 
 		if (mode === 'edit') {
-			let category = getData(StorageItems.Categories);
+			let data = getData(StorageItems.Records);
 
-			form.id = category.id;
-			form.name = category.name;
-			form.description = category.description;
-			form.icon = {
-				name: category.iconName,
-				set: category.iconSet
-			};
+			form.id = data.id;
+			form.name = data.name;
+			form.description = data.description;
 		}
+
+		form.accountId = Number(data.accountId);
 
 		validateForm();
 	}
@@ -65,24 +59,11 @@
 	}
 
 	function validateForm() {
-		// default initials
-		isValidForm = true;
-		validationErrors.name.message = '';
-		validationErrors.icon.message = '';
-
 		if (!form.name || form.name === '') {
 			validationErrors.name.message = 'Name is required';
 			isValidForm = false;
-		}
-
-		if (!form?.icon || form.icon?.name === '') {
-			validationErrors.icon.message = 'Icon is required';
-			isValidForm = false;
-		}
-
-		if (isValidForm) {
+		} else {
 			validationErrors.name.message = '';
-			validationErrors.icon.message = '';
 			isValidForm = true;
 		}
 	}
@@ -91,14 +72,13 @@
 		const createdDate = mode === 'new' ? new Date() : form.createdDate;
 		const description = form.description === '' ? null : form.description;
 
-		const finalForm: Category = {
+		const finalForm: Record = {
 			id: form.id,
 			name: form.name!,
 			description,
 			createdDate,
-			iconName: form.icon!.name,
-			iconSet: form.icon!.set,
-			userId: form.userId
+			userId: form.userId,
+			accountId: form.accountId
 		};
 
 		return finalForm;
@@ -108,10 +88,10 @@
 		const finalForm = returnFinalFormData();
 
 		if (mode === 'new') {
-			fetchData<Category>(HTTP_METHOD.POST, APIS.CATEGORIES, finalForm)
+			fetchData<Record>(HTTP_METHOD.POST, APIS.RECORDS, finalForm)
 				.then((resp) => {
 					ToastStore.set({
-						title: 'Created Account',
+						title: 'Created Record',
 						message: resp.message,
 						type: 'success'
 					});
@@ -126,10 +106,10 @@
 					});
 				});
 		} else {
-			fetchData(HTTP_METHOD.PUT, APIS.CATEGORIES, finalForm)
+			fetchData<Record>(HTTP_METHOD.PUT, APIS.RECORDS, finalForm)
 				.then((resp) => {
 					ToastStore.set({
-						title: 'Updated Category',
+						title: 'Updated Record',
 						message: resp.message,
 						type: 'success'
 					});
@@ -144,29 +124,18 @@
 		}
 	}
 
-	const onIconChanged = (eventSelectedIcon: CustomEvent<SelectedIcon | null>) => {
-		form.icon = eventSelectedIcon?.detail;
-
-		validateForm();
-
-		return null;
-	};
-
 	function resetForm() {
 		form = {
 			id: 0,
-			name: <string | null>null,
-			description: <string | null>null,
-			icon: <SelectedIcon | null>null,
-			createdDate: new Date(),
-			userId: userProfile!.userId
+			name: null,
+			description: null,
+			createdDate: null || new Date(),
+			userId: userProfile!.userId,
+			accountId: Number(data.accountId)
 		};
 
 		validationErrors = {
 			name: {
-				message: ''
-			},
-			icon: {
 				message: ''
 			}
 		};
@@ -179,11 +148,11 @@
 
 <div class="page">
 	{#if mode === 'new'}
-		<h1>New Category</h1>
-		<p>Create your category</p>
+		<h1>New Record</h1>
+		<p>Create your record</p>
 	{:else}
-		<h1>Edit Category</h1>
-		<p>Edit your category</p>
+		<h1>Edit Record</h1>
+		<p>Edit your record</p>
 	{/if}
 
 	<form class="form-container" on:submit|preventDefault={onSubmit}>
@@ -197,7 +166,7 @@
 				on:input={() => validateForm()}
 			/>
 
-			{#if validationErrors.name.message !== ''}
+			{#if validationErrors.name.message}
 				<div class="alert alert-danger" role="alert">{validationErrors.name.message}</div>
 			{/if}
 		</div>
@@ -205,15 +174,6 @@
 		<div class="mb-3">
 			<label for="description" class="form-label">Description</label>
 			<textarea class="form-control" id="description" rows="3" bind:value={form.description} />
-		</div>
-
-		<div class="mb-3">
-			<label for="description" class="form-label">Icon</label>
-			<IconPicker on:iconChanged={onIconChanged} selectedIcon={form?.icon} />
-
-			{#if validationErrors.icon.message !== ''}
-				<div class="alert alert-danger" role="alert">{validationErrors.icon.message}</div>
-			{/if}
 		</div>
 
 		<div class="mb-3">

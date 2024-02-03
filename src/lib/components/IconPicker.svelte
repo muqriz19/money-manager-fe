@@ -1,8 +1,9 @@
 <script lang="ts">
 	import type { IconSet, SelectedIcon } from '$lib/data/core';
 	import { debounce } from '$lib/helpers/utils';
-	import * as bootsrapIcons from 'bootstrap-icons/font/bootstrap-icons.json';
+	import * as bootstrapIcons from 'bootstrap-icons/font/bootstrap-icons.json';
 	import { createEventDispatcher, onMount } from 'svelte';
+	import { createIcons, icons as lucideIcons } from 'lucide';
 
 	let iconList: IconSet[] = [];
 
@@ -18,6 +19,8 @@
 	export const dispatch = createEventDispatcher();
 
 	let dropdownInputRef: HTMLSelectElement;
+
+	const alphabetsLowercase = 'abcdefghijklmnopqrstuvwxyz'.split('');
 
 	onMount(() => {
 		initIconset();
@@ -41,8 +44,8 @@
 		iconList.push(nullSet);
 
 		// boostrap icons
-		const boostrapStringJson = JSON.stringify(bootsrapIcons);
-		const icons = [
+		const boostrapStringJson = JSON.stringify(bootstrapIcons);
+		const boostrapIcons = [
 			...new Set(
 				boostrapStringJson.split('"').filter((iconInString) => {
 					if (
@@ -62,12 +65,59 @@
 		const iconSetBootstrap: IconSet = {
 			name: 'Set 1',
 			set: 'bootstrapIcons',
-			icons: icons
+			icons: boostrapIcons
 		};
 
 		iconList.push(iconSetBootstrap);
-	}
 
+		// lucide icons
+		const lucideIconsArr = Object.keys(lucideIcons).map((icon) => {
+			let finalWord = '';
+
+			const currentIconLetters = icon.split('');
+
+			for (let cil = 0; cil < currentIconLetters.length; cil++) {
+				// check if next is caps
+				if (
+					alphabetsLowercase.some((alphabet) => alphabet.toUpperCase() === currentIconLetters[cil])
+				) {
+					// check if neighbour is cap
+					if (
+						currentIconLetters[cil + 1] &&
+						alphabetsLowercase.some(
+							(alphabet) => alphabet.toUpperCase() === currentIconLetters[cil + 1]
+						)
+					) {
+						finalWord += currentIconLetters[cil] + '-';
+					} else {
+						finalWord += currentIconLetters[cil];
+					}
+				} else {
+					// check if neighbour is cap
+					if (
+						currentIconLetters[cil + 1] &&
+						alphabetsLowercase.some(
+							(alphabet) => alphabet.toUpperCase() === currentIconLetters[cil + 1]
+						)
+					) {
+						finalWord += currentIconLetters[cil] + '-';
+					} else {
+						finalWord += currentIconLetters[cil];
+					}
+				}
+			}
+
+			return finalWord.toLowerCase();
+		});
+
+		const iconSetLucide: IconSet = {
+			name: 'Set 2',
+			set: 'lucideIcons',
+			icons: lucideIconsArr
+		};
+
+		iconList.push(iconSetLucide);
+	}
 
 	function onSelectedIconSet($event: any) {
 		const value = $event.target.value;
@@ -84,36 +134,54 @@
 
 				currentIcons = currentIconSet.icons;
 				originalReferenceIcons = currentIconSet.icons;
+
+				if (value === 'lucideIcons') {
+					createLucideIcons();
+				}
 			}
 		}
 	}
 
 	function searchIconSet($event: any) {
+		currentIcons = [];
+
 		debounce(500, () => {
 			const query = String($event.target.value).toLowerCase();
 
 			if (currentIconSet) {
-				if (currentIconSet.set === 'bootstrapIcons') {
-					const foundIcons = originalReferenceIcons.filter((ref) => {
-						return ref.toLowerCase().includes(query);
-					});
+				const foundIcons = originalReferenceIcons.filter((ref) => {
+					return ref.toLowerCase().includes(query);
+				});
 
-					currentIcons = foundIcons;
-				}
+				currentIcons = foundIcons;
 
 				if (query === '') {
 					currentIcons = currentIconSet.icons;
+				}
+
+				if (currentIconSet.set === 'lucideIcons') {
+					createLucideIcons();
 				}
 			}
 		});
 	}
 
 	function selectTheIcon(onSelectedIcon: string) {
+		clearAnyIcons();
+		selectedIcon = null;
+
+
+		console.log(currentIconSet);
+
 		if (currentIconSet) {
 			selectedIcon = {
 				set: currentIconSet?.set,
 				name: onSelectedIcon
 			};
+
+			if (currentIconSet.set === "lucideIcons") {
+				createLucideIcons();
+			}
 
 			dispatch('iconChanged', selectedIcon);
 		}
@@ -122,6 +190,8 @@
 	}
 
 	function clearSelectionIcon() {
+		clearAnyIcons();
+
 		selectedIcon = null;
 
 		dispatch('iconChanged', selectedIcon);
@@ -134,6 +204,27 @@
 	function toggleViewIconList() {
 		hasListHidden = !hasListHidden;
 	}
+
+	function createLucideIcons() {
+		setTimeout(() => {
+			createIcons({ icons: lucideIcons });
+		}, 0);
+	}
+
+	function clearAnyIcons() {
+		console.log(selectedIcon)
+		const container = document.querySelector('.box');
+
+		console.dir(container);
+
+		if (container) {
+			for (let c = 0; c < container!.children.length; c++) {
+				if (container!.children[c].localName === 'svg') {
+					container!.removeChild(container.children[c]);
+				}
+			}
+		}
+	}
 </script>
 
 <div class="icon-picker-container">
@@ -144,6 +235,10 @@
 					{#if selectedIcon}
 						{#if selectedIcon?.set === 'bootstrapIcons'}
 							<i class="bi bi-{selectedIcon?.name} iconSet" title={selectedIcon?.set} />
+						{/if}
+
+						{#if selectedIcon?.set === 'lucideIcons'}
+							<i data-lucide={selectedIcon?.name} class="iconSet" title={selectedIcon?.set} />
 						{/if}
 					{:else}
 						<span>N/A</span>
@@ -208,6 +303,14 @@
 						</button>
 					{/each}
 				{/if}
+
+				{#if currentIconSet.set === 'lucideIcons'}
+					{#each currentIcons as icon}
+						<button type="button" class="btn iconSet" on:click={selectTheIcon(icon)} title={icon}>
+							<i data-lucide={icon} data-icon-set={currentIconSet?.set} />
+						</button>
+					{/each}
+				{/if}
 			</div>
 		{/if}
 	{/if}
@@ -254,8 +357,8 @@
 			max-height: 250px;
 			overflow-y: auto;
 
-			border-top: 1px solid $grey-color;
-			border-bottom: 1px solid $grey-color;
+			border-top: 1px solid $light-grey-color;
+			border-bottom: 1px solid $light-grey-color;
 			margin: 20px 0 0 0;
 			padding: 20px 0;
 		}

@@ -1,21 +1,25 @@
 <script lang="ts">
 	import { APIS, HTTP_METHOD, fetchData, getData } from '$lib/helpers/utils';
 	import { onMount } from 'svelte';
-	import ToastStore from '../../../stores/ToastStore';
 	import { StorageItems } from '$lib/data/core';
-	import type { Account } from '$lib/data/data';
+	import type { Account, ProfileData } from '$lib/data/data';
+	import ToastStore from '../../../../stores/ToastStore.js';
+	import ProfileStore from '../../../../stores/ProfileStore.js';
 
 	export let data;
 	let mode = data.mode;
 
-	const form = {
+	let userProfile: ProfileData | null = null;
+
+	let form = {
 		id: 0,
 		name: null,
 		description: null,
-		createdDate: null || new Date()
+		createdDate: null || new Date(),
+		userId: 0
 	};
 
-	const validationErrors = {
+	let validationErrors = {
 		name: {
 			message: ''
 		}
@@ -28,6 +32,14 @@
 	});
 
 	function init() {
+		ProfileStore.subscribe((profile) => {
+			if (profile) {
+				userProfile = profile;
+
+				form.userId = userProfile.userId;
+			}
+		});
+
 		if (mode === 'edit') {
 			let account = getData(StorageItems.Accounts);
 
@@ -61,7 +73,8 @@
 			id: form.id,
 			name: form.name!,
 			description,
-			createdDate
+			createdDate,
+			userId: form.userId
 		};
 
 		return finalForm;
@@ -78,6 +91,8 @@
 						message: resp.message,
 						type: 'success'
 					});
+
+					resetForm();
 				})
 				.catch((err) => {
 					ToastStore.set({
@@ -104,11 +119,31 @@
 				});
 		}
 	}
+
+	function resetForm() {
+		form = {
+			id: 0,
+			name: null,
+			description: null,
+			createdDate: null || new Date(),
+			userId: userProfile!.userId
+		};
+
+		validationErrors = {
+			name: {
+				message: ''
+			}
+		};
+
+		isValidForm = false;
+
+		validateForm();
+	}
 </script>
 
 <div class="page">
 	{#if mode === 'new'}
-		<h1>New Accounts</h1>
+		<h1>New Account</h1>
 		<p>Create your account</p>
 	{:else}
 		<h1>Edit Account</h1>

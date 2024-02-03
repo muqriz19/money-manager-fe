@@ -19,11 +19,11 @@
 			name: 'Accounts',
 			children: [
 				{
-					path: 'members/accounts',
+					path: '/members/accounts',
 					name: 'All'
 				},
 				{
-					path: 'members/accounts/new',
+					path: '/members/accounts/new',
 					name: 'New'
 				}
 			]
@@ -33,11 +33,11 @@
 			name: 'Categories',
 			children: [
 				{
-					path: 'members/categories',
+					path: '/members/categories',
 					name: 'All'
 				},
 				{
-					path: 'members/categories/new',
+					path: '/members/categories/new',
 					name: 'New'
 				}
 			]
@@ -49,8 +49,6 @@
 	onMount(() => {
 		init();
 	});
-
-	onDestroy(() => {});
 
 	function init() {
 		ProfileStore.subscribe((profileData) => {

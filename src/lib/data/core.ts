@@ -15,7 +15,8 @@ export interface RouteMetaData {
 export enum StorageItems {
     Accounts = 'Accounts',
     Categories = 'Categories',
-    Profile = "Profile"
+    Profile = "Profile",
+    Records = "Records"
 }
 
 export interface IconSet {
