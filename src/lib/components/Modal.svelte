@@ -20,6 +20,9 @@
 		}
 	};
 
+	export let result: any = true;
+	export let disabledButton = false;
+
 	onMount(() => {
 		hideModal();
 
@@ -62,7 +65,7 @@
 			hideModal();
 		}
 
-		dispatch('result', true);
+		dispatch('result', result);
 	};
 
 	const closeModal = () => {
@@ -105,7 +108,8 @@
 
 				{#if modalConfig?.foot?.execute}
 					<button type="button" class="btn btn-primary" on:click={executeCommand}
-						>Save changes</button
+					disabled={disabledButton}
+						>{modalConfig?.foot?.execute?.text ?? 'Save Changes'}</button
 					>
 				{/if}
 			</div>

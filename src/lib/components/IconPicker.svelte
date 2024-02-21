@@ -4,6 +4,7 @@
 	import * as bootstrapIcons from 'bootstrap-icons/font/bootstrap-icons.json';
 	import { createEventDispatcher, onMount } from 'svelte';
 	import { createIcons, icons as lucideIcons } from 'lucide';
+	import { createLucideIcons } from '$lib/helpers/ui';
 
 	let iconList: IconSet[] = [];
 
@@ -21,6 +22,8 @@
 	let dropdownInputRef: HTMLSelectElement;
 
 	const alphabetsLowercase = 'abcdefghijklmnopqrstuvwxyz'.split('');
+
+	let notFoundMessage = 'Icon does not exist';
 
 	onMount(() => {
 		initIconset();
@@ -136,15 +139,13 @@
 				originalReferenceIcons = currentIconSet.icons;
 
 				if (value === 'lucideIcons') {
-					createLucideIcons();
+					activateLucideIcons();
 				}
 			}
 		}
 	}
 
 	function searchIconSet($event: any) {
-		currentIcons = [];
-
 		debounce(500, () => {
 			const query = String($event.target.value).toLowerCase();
 
@@ -203,19 +204,13 @@
 		activateLucideIcons();
 	}
 
-	function createLucideIcons() {
-		setTimeout(() => {
-			createIcons({ icons: lucideIcons });
-		}, 0);
-	}
-
 	function activateLucideIcons() {
 		if (currentIconSet && currentIconSet.set === 'lucideIcons') {
-			createLucideIcons();
+			createLucideIcons(0);
 		}
 	}
 
-	function clearAnyIcons() {
+	export function clearAnyIcons() {
 		const container = document.querySelector('.box');
 
 		if (container) {
@@ -296,19 +291,27 @@
 		{#if !hasListHidden}
 			<div class="middle" style="max-height: {hasListExpanded ? '500px' : '250px'}">
 				{#if currentIconSet.set === 'bootstrapIcons'}
-					{#each currentIcons as icon}
-						<button type="button" class="btn iconSet" on:click={selectTheIcon(icon)} title={icon}>
-							<i class="bi bi-{icon}" data-icon-set={currentIconSet?.set} />
-						</button>
-					{/each}
+					{#if currentIcons.length > 0}
+						{#each currentIcons as icon}
+							<button type="button" class="btn iconSet" on:click={selectTheIcon(icon)} title={icon}>
+								<i class="bi bi-{icon}" data-icon-set={currentIconSet?.set} />
+							</button>
+						{/each}
+					{:else}
+						<span class="text-center">{notFoundMessage}</span>
+					{/if}
 				{/if}
 
 				{#if currentIconSet.set === 'lucideIcons'}
-					{#each currentIcons as icon}
-						<button type="button" class="btn iconSet" on:click={selectTheIcon(icon)} title={icon}>
-							<i data-lucide={icon} data-icon-set={currentIconSet?.set} />
-						</button>
-					{/each}
+					{#if currentIcons.length > 0}
+						{#each currentIcons as icon}
+							<button type="button" class="btn iconSet" on:click={selectTheIcon(icon)} title={icon}>
+								<i data-lucide={icon} data-icon-set={currentIconSet?.set} />
+							</button>
+						{/each}
+					{:else}
+						<span class="text-center">{notFoundMessage}</span>
+					{/if}
 				{/if}
 			</div>
 		{/if}
@@ -320,7 +323,7 @@
 		.top-section {
 			.iconSelected {
 				.box {
-					border: 1px solid $grey-color;
+					border: 1px solid $light-grey-color;
 					width: 64px;
 					height: 64px;
 

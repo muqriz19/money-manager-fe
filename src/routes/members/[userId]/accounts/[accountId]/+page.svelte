@@ -6,7 +6,7 @@
 	import {
 		APIS,
 		HTTP_METHOD,
-		confirmAction,
+		triggerModal,
 		fetchData,
 		getData,
 		navigateTo,
@@ -140,7 +140,9 @@
 							viewRow: (rowData: any) => {
 								const id = rowData.id;
 
-								navigateTo(`/members/${profileDetail?.userId}/accounts/${data.accountId}/records/${rowData.id}`);
+								navigateTo(
+									`/members/${profileDetail?.userId}/accounts/${data.accountId}/records/${rowData.id}`
+								);
 							},
 							editRow: (rowData: any) => {
 								saveData(rowData, StorageItems.Records);
@@ -154,7 +156,7 @@
 									const id = rowData.id;
 									const path = APIS.RECORDS + '/' + id;
 
-									const confirmed = await confirmAction({ modalConfig });
+									const confirmed = await triggerModal({ modalConfig });
 
 									if (confirmed) {
 										return new Promise((resolve) => {

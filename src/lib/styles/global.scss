@@ -79,6 +79,10 @@
     }
 }
 
+.iconSet {
+    @include iconSetStandard();
+}
+
 button.iconSet {
     height: 64px;
     width: 64px;
@@ -90,6 +94,19 @@ i[data-icon-set*=bootstrapIcons].iconSet {
     font-size: 32px;
 
     @include iconSetStandard();
+}
+
+@mixin lucideStandardSize {
+    width: 16px !important;
+    height: 16px !important;
+}
+
+button>svg.lucide {
+    @include lucideStandardSize();
+}
+
+i[data-icon-set*=lucideIcons].iconSet svg.lucide {
+    @include lucideStandardSize();
 }
 
 .page {

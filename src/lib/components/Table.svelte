@@ -1,5 +1,6 @@
 <script lang="ts">
 	import type { DataProp, TableAPIQuery, TableConfig, TableHeader } from '$lib/data/table';
+	import { createLucideIcons } from '$lib/helpers/ui';
 	import { HTTP_METHOD, debounce, fetchData } from '$lib/helpers/utils';
 	import Spinner from './Spinner.svelte';
 
@@ -274,8 +275,11 @@
 	};
 
 	const deleteMethod = (data: any, functionCode: Function, refreshTable: boolean) => {
+		console.log(data, functionCode, refreshTable);
+
 		if (functionCode) {
 			executeCode(data, functionCode).then((apiSuccess) => {
+				console.log(refreshTable, apiSuccess);
 				if (refreshTable && apiSuccess) {
 					refresh();
 				}
@@ -308,6 +312,8 @@
 				const element = document.querySelector(`[data-row-id="${rowId}"]`)!;
 				element.innerHTML = '';
 				element.append(rowValue);
+
+				createLucideIcons(0);
 			}, 100);
 
 			return '';

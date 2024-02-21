@@ -4,7 +4,6 @@ import type { Writable } from "svelte/store";
 import ProfileStore from "../../stores/ProfileStore";
 import ToastStore from "../../stores/ToastStore";
 import Modal from '../components/Modal.svelte';
-import { browser } from "$app/environment";
 
 const ROOT_API = "http://localhost:5133/api/";
 
@@ -62,18 +61,13 @@ export function fetchData<T>(method: HTTP_METHOD, apiRoutes: APIS | string, body
             console.log('RESPONSE ', resp);
 
             if (!resp.ok) {
-                return Promise.reject(resp);
+                // return Promise.reject(resp);
+                throw resp;
+            } else {
+                return resp.json();
             }
-
-            const respJson = resp.json();
-
-            return respJson;
-        })
-        .then((respBody: ResponseBody) => {
-            console.log('BODY ', respBody);
-            return respBody;
-        }).catch(async err => {
-            const respData = await err.json();
+        }).catch(err => {
+            const respData = err.json();
             console.log('ERROR ', respData);
 
             if (respData && respData.status === 401) {
@@ -124,7 +118,7 @@ export function saveData(data: any, key: StorageItems) {
     }
 }
 
-export function getData(key: StorageItems) {   
+export function getData(key: StorageItems) {
     let data = null;
 
     data = sessionStorage.getItem(key);
@@ -138,18 +132,40 @@ export function getData(key: StorageItems) {
     return data;
 }
 
+let modalReference: Modal | null = null;
+
 // Reference https://svelte.dev/repl/15d7c21aa036464cb0220af60dde3843?version=3.48.0
-export function confirmAction(options: any) {
+export function triggerModal(options: any) {
     return new Promise(resolve => {
-        const modal = new Modal({
+        modalReference = null;
+
+        modalReference = new Modal({
             target: document.body,
             props: options,
         });
-        modal.$on('result', e => {
+
+        modalReference.$on('result', e => {
             resolve(e.detail);
-            modal.$destroy();
+            if (modalReference) {
+                modalReference.$destroy();
+            }
         });
     })
+}
+
+// export function triggerModal(options: any) {
+//     const modalRef = new Modal({
+//         target: document.body,
+//         props: options,
+//     });
+
+//     return modalRef;
+// }
+
+export function getCurrentModalReference(): Promise<Modal | null> {
+    return new Promise((resolve) => {
+        resolve(modalReference);
+    });
 }
 
 export function clearStorage() {

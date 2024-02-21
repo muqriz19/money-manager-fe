@@ -53,7 +53,18 @@ export interface Record {
     createdDate: Date;
     userId: number;
     accountId: number;
-    logs?: []
+    logs: Log[] | null;
+}
+
+export interface Log {
+    id: number;
+    name: string;
+    description: string | null;
+    createdDate: Date;
+    value: number;
+    userId: number;
+    recordId: number;
+    categoryId: number;
 }
 
 export type LoaderType = 'regular';

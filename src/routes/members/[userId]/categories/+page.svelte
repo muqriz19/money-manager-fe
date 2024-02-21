@@ -8,7 +8,7 @@
 	import {
 		APIS,
 		HTTP_METHOD,
-		confirmAction,
+		triggerModal,
 		fetchData,
 		navigateTo,
 		saveData
@@ -111,7 +111,22 @@
 										iTag.style.fontSize = '16px';
 
 										return iTag;
-									} else {
+									} else if (row?.iconSet === 'lucideIcons') {
+										const iTagWrapper = document.createElement('i');
+										const iTag = document.createElement('i');
+
+										iTagWrapper.setAttribute('class', `iconSet`);
+										iTagWrapper.setAttribute('data-icon-set', row.iconSet);
+										iTag.setAttribute('title', row?.iconName);
+										iTag.setAttribute('data-icon-set', row.iconSet);
+										iTag.setAttribute('data-lucide', row.iconName);
+										iTag.style.fontSize = '16px';
+
+										iTagWrapper.appendChild(iTag);
+
+										return iTagWrapper;
+									}				
+									else {
 										return '';
 									}
 								}
@@ -135,7 +150,7 @@
 									const id = rowData.id;
 									const path = APIS.CATEGORIES + '/' + id;
 
-									const confirmed = await confirmAction({ modalConfig });
+									const confirmed = await triggerModal({ modalConfig });
 
 									if (confirmed) {
 										return new Promise((resolve) => {
@@ -182,7 +197,8 @@
 				<button
 					type="button"
 					class="btn btn-primary"
-					on:click={() => navigateTo(`/members/${profileDetail?.userId}/categories/0/new`)}>New</button
+					on:click={() => navigateTo(`/members/${profileDetail?.userId}/categories/0/new`)}
+					>New</button
 				>
 			</div>
 		</div>

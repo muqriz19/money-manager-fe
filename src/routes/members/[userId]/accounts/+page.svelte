@@ -7,7 +7,7 @@
 	import {
 		APIS,
 		HTTP_METHOD,
-		confirmAction,
+		triggerModal,
 		fetchData,
 		navigateTo,
 		saveData
@@ -134,9 +134,11 @@
 							delete: {
 								deleteRow: async (rowData: any) => {
 									const id = rowData.id;
-									const path = APIS.ACCOUNTS + '/' + id;
+									const path = `${APIS.ACCOUNTS}/${id}`;
+									console.log(rowData);
+									console.log(path);
 
-									const confirmed = await confirmAction({ modalConfig });
+									const confirmed = await triggerModal({ modalConfig });
 
 									if (confirmed) {
 										return new Promise((resolve) => {

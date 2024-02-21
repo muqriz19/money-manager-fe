@@ -13,6 +13,7 @@ export interface ModalConfig {
         execute?: {
             hideModal: boolean;
             command?: ModalAction;
+            text?: string;
         }
     }
 }
