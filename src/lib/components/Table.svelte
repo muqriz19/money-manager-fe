@@ -444,11 +444,17 @@
 							</tr>
 						{/each}
 					{:else}
-						<span>No data found...</span>
+						<tr>
+							<td colspan={tableHeaders.length + 1}>
+								<span>No data found...</span>
+							</td>
+						</tr>
 					{/if}
 				{:else}
 					<tr class="loader-container">
-						<Spinner />
+						<td colspan={tableHeaders.length + 1} class="text-center">
+							<Spinner />
+						</td>
 					</tr>
 				{/if}
 			</tbody>
