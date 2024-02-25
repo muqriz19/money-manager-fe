@@ -1,8 +1,9 @@
 <script lang="ts">
-	import type { Category } from '$lib/data/data';
+	import type { Category, ProfileData } from '$lib/data/data';
 	import { clearAnyLucideIcons, createLucideIcons } from '$lib/helpers/ui';
-	import { debounce } from '$lib/helpers/utils';
+	import { debounce, getCurrentModalReference, navigateTo } from '$lib/helpers/utils';
 	import { createEventDispatcher, onMount } from 'svelte';
+	import ProfileStore from '../../stores/ProfileStore';
 
 	export const dipatch = createEventDispatcher();
 
@@ -15,7 +16,10 @@
 	let lastInputSearch = '';
 	let showOptions = false;
 
+	let userProfile: ProfileData | null = null;
+
 	onMount(() => {
+		init();
 		dipatchSelectedCategory(null);
 	});
 
@@ -37,6 +41,14 @@
 		});
 
 		return null;
+	}
+
+	function init() {
+		ProfileStore.subscribe((profile) => {
+			if (profile) {
+				userProfile = profile;
+			}
+		});
 	}
 
 	function preInitSearch() {
@@ -87,7 +99,13 @@
 	}
 
 	function openCategoryPage() {
-		// triggerModal({})
+		navigateTo(`/members/${userProfile?.userId}/categories/0/new`);
+
+		getCurrentModalReference().then((modalReference) => {
+			if (modalReference) {
+				modalReference.hideModal();
+			}
+		});
 	}
 </script>
 
@@ -133,7 +151,7 @@
 
 			<div class="add-category-button-wrapper">
 				<button type="button" on:click={openCategoryPage} title="Add Category">
-					<i class="bi bi-x" />
+					<i class="bi bi-plus" />
 				</button>
 			</div>
 		</div>
