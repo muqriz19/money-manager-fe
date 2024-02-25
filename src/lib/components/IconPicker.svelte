@@ -26,100 +26,108 @@
 	let notFoundMessage = 'Icon does not exist';
 
 	onMount(() => {
-		initIconset();
+		initIconset().then(() => {
+			createLucideIcons(0);
+		});
 	});
 
 	function initIconset() {
-		iconList = [];
-		currentIconSet = null;
-		currentIcons = [];
-		originalReferenceIcons = [];
-		selectedIcon = null;
-		dropdownInputRef.value = '';
+		return new Promise<void>((resolve) => {
+			iconList = [];
+			currentIconSet = null;
+			currentIcons = [];
+			originalReferenceIcons = [];
+			selectedIcon = null;
+			dropdownInputRef.value = '';
 
-		// default null
-		const nullSet: IconSet = {
-			name: 'Select an Iconset',
-			set: '',
-			icons: []
-		};
+			// default null
+			const nullSet: IconSet = {
+				name: 'Select an Iconset',
+				set: '',
+				icons: []
+			};
 
-		iconList.push(nullSet);
+			iconList.push(nullSet);
 
-		// boostrap icons
-		const boostrapStringJson = JSON.stringify(bootstrapIcons);
-		const boostrapIcons = [
-			...new Set(
-				boostrapStringJson.split('"').filter((iconInString) => {
+			// boostrap icons
+			const boostrapStringJson = JSON.stringify(bootstrapIcons);
+			const boostrapIcons = [
+				...new Set(
+					boostrapStringJson.split('"').filter((iconInString) => {
+						if (
+							iconInString !== '{' &&
+							iconInString !== '}' &&
+							!iconInString.includes(':') &&
+							!iconInString.includes('default')
+						) {
+							return true;
+						}
+
+						return false;
+					})
+				)
+			];
+
+			const iconSetBootstrap: IconSet = {
+				name: 'Set 1',
+				set: 'bootstrapIcons',
+				icons: boostrapIcons
+			};
+
+			iconList.push(iconSetBootstrap);
+
+			// lucide icons
+			const lucideIconsArr = Object.keys(lucideIcons).map((icon) => {
+				let finalWord = '';
+
+				const currentIconLetters = icon.split('');
+
+				for (let cil = 0; cil < currentIconLetters.length; cil++) {
+					// check if next is caps
 					if (
-						iconInString !== '{' &&
-						iconInString !== '}' &&
-						!iconInString.includes(':') &&
-						!iconInString.includes('default')
-					) {
-						return true;
-					}
-
-					return false;
-				})
-			)
-		];
-
-		const iconSetBootstrap: IconSet = {
-			name: 'Set 1',
-			set: 'bootstrapIcons',
-			icons: boostrapIcons
-		};
-
-		iconList.push(iconSetBootstrap);
-
-		// lucide icons
-		const lucideIconsArr = Object.keys(lucideIcons).map((icon) => {
-			let finalWord = '';
-
-			const currentIconLetters = icon.split('');
-
-			for (let cil = 0; cil < currentIconLetters.length; cil++) {
-				// check if next is caps
-				if (
-					alphabetsLowercase.some((alphabet) => alphabet.toUpperCase() === currentIconLetters[cil])
-				) {
-					// check if neighbour is cap
-					if (
-						currentIconLetters[cil + 1] &&
 						alphabetsLowercase.some(
-							(alphabet) => alphabet.toUpperCase() === currentIconLetters[cil + 1]
+							(alphabet) => alphabet.toUpperCase() === currentIconLetters[cil]
 						)
 					) {
-						finalWord += currentIconLetters[cil] + '-';
+						// check if neighbour is cap
+						if (
+							currentIconLetters[cil + 1] &&
+							alphabetsLowercase.some(
+								(alphabet) => alphabet.toUpperCase() === currentIconLetters[cil + 1]
+							)
+						) {
+							finalWord += currentIconLetters[cil] + '-';
+						} else {
+							finalWord += currentIconLetters[cil];
+						}
 					} else {
-						finalWord += currentIconLetters[cil];
-					}
-				} else {
-					// check if neighbour is cap
-					if (
-						currentIconLetters[cil + 1] &&
-						alphabetsLowercase.some(
-							(alphabet) => alphabet.toUpperCase() === currentIconLetters[cil + 1]
-						)
-					) {
-						finalWord += currentIconLetters[cil] + '-';
-					} else {
-						finalWord += currentIconLetters[cil];
+						// check if neighbour is cap
+						if (
+							currentIconLetters[cil + 1] &&
+							alphabetsLowercase.some(
+								(alphabet) => alphabet.toUpperCase() === currentIconLetters[cil + 1]
+							)
+						) {
+							finalWord += currentIconLetters[cil] + '-';
+						} else {
+							finalWord += currentIconLetters[cil];
+						}
 					}
 				}
-			}
 
-			return finalWord.toLowerCase();
+				return finalWord.toLowerCase();
+			});
+
+			const iconSetLucide: IconSet = {
+				name: 'Set 2',
+				set: 'lucideIcons',
+				icons: lucideIconsArr
+			};
+
+			iconList.push(iconSetLucide);
+
+			resolve();
 		});
-
-		const iconSetLucide: IconSet = {
-			name: 'Set 2',
-			set: 'lucideIcons',
-			icons: lucideIconsArr
-		};
-
-		iconList.push(iconSetLucide);
 	}
 
 	function onSelectedIconSet($event: any) {
@@ -334,6 +342,16 @@
 					align-items: center;
 
 					background-color: $white-color;
+
+					> i {
+						width: 35px;
+						height: 35px;
+					}
+
+					> .lucide {
+						width: 35px !important;
+						height: 35px !important;
+					}
 				}
 			}
 		}
