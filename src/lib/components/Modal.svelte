@@ -1,9 +1,12 @@
 <script lang="ts">
 	import type { ModalConfig } from '$lib/data/modal';
+	import { generateRandomId } from '$lib/helpers/utils';
 	import { createEventDispatcher, onMount } from 'svelte';
 
 	let modalElement: HTMLElement | null;
 	let buttonModal: HTMLButtonElement | null;
+
+	let finalModalId: string = '';
 
 	export const dispatch = createEventDispatcher();
 
@@ -30,11 +33,15 @@
 	});
 
 	export const showModal = () => {
-		modalElement = document.getElementById('modalTHING')!;
-		buttonModal = document.querySelector('#btnModal') as HTMLButtonElement;
-		if (buttonModal) {
-			buttonModal.click();
-		}
+		generateModalId().then((modalId: string) => {
+			modalElement = document.getElementById(`modalTHING_${modalId}`);
+			buttonModal = document.querySelector(`#btnModal_${modalId}`) as HTMLButtonElement;
+
+			if (buttonModal) {
+				buttonModal.click();
+				console.log('MODAL CONFIG ', modalConfig);
+			}
+		});
 	};
 
 	export const hideModal = () => {
@@ -68,6 +75,16 @@
 		dispatch('result', result);
 	};
 
+	function generateModalId() {
+		return new Promise<string>(async (resolve) => {
+			let modalId = generateRandomId(5);
+
+			finalModalId = modalId;
+
+			resolve(modalId);
+		});
+	}
+
 	const closeModal = () => {
 		dispatch('result', false);
 	};
@@ -75,15 +92,15 @@
 
 <button
 	type="button"
-	id="btnModal"
+	id="btnModal_{finalModalId}"
 	class="btn btn-primary invisible"
 	data-bs-toggle="modal"
-	data-bs-target="#modalTHING"
+	data-bs-target="#modalTHING_{finalModalId}"
 >
 	Launch demo modal
 </button>
 
-<div class="modal fade" tabindex="-1" id="modalTHING">
+<div class="modal fade" tabindex="-1" id="modalTHING_{finalModalId}">
 	<div class="modal-dialog">
 		<div class="modal-content">
 			<div class="modal-header">
@@ -107,9 +124,11 @@
 				{/if}
 
 				{#if modalConfig?.foot?.execute}
-					<button type="button" class="btn btn-primary" on:click={executeCommand}
-					disabled={disabledButton}
-						>{modalConfig?.foot?.execute?.text ?? 'Save Changes'}</button
+					<button
+						type="button"
+						class="btn btn-primary"
+						on:click={executeCommand}
+						disabled={disabledButton}>{modalConfig?.foot?.execute?.text ?? 'Save Changes'}</button
 					>
 				{/if}
 			</div>
