@@ -153,15 +153,6 @@ export function triggerModal(options: any) {
     })
 }
 
-// export function triggerModal(options: any) {
-//     const modalRef = new Modal({
-//         target: document.body,
-//         props: options,
-//     });
-
-//     return modalRef;
-// }
-
 export function getCurrentModalReference(): Promise<Modal | null> {
     return new Promise((resolve) => {
         resolve(modalReference);
@@ -170,4 +161,14 @@ export function getCurrentModalReference(): Promise<Modal | null> {
 
 export function clearStorage() {
     sessionStorage.clear();
+}
+
+export function generateRandomId(length: number) {
+    const characters = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+    let randomId = '';
+    for (let i = 0; i < length; i++) {
+        randomId += characters.charAt(Math.floor(Math.random() * characters.length));
+    }
+
+    return randomId;
 }
