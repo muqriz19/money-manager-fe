@@ -21,7 +21,8 @@ export enum APIS {
     Login = "Authorization/Login",
     FORGOT_PASSWORD = "Authorization/ForgotPassword",
     RESET_PASSWORD = "Authorization/ResetPassword",
-    RECORDS = "Records"
+    RECORDS = "Records",
+    LOGS = "Logs"
 }
 
 export interface ResponseBody {
