@@ -101,7 +101,7 @@
 		aria-expanded="false"
 		on:click={onProfileClick}
 	>
-		<img src={defaultUserAvatar} alt="" />
+		<img src={defaultUserAvatar} alt="Your profile avatar" />
 	</button>
 	<ul
 		class="dropdown-menu"
@@ -135,6 +135,7 @@
 			position: relative;
 			top: 50%;
 			left: 50%;
+			width: 20px;
 			-webkit-transform: translate(-50%, -50%);
 			-ms-transform: translate(-50%, -50%);
 			transform: translate(-50%, -50%);
