@@ -40,10 +40,14 @@ let globalStore: { [key: string]: Writable<any> } | null = null;
 export function fetchData<T>(method: HTTP_METHOD, apiRoutes: APIS | string, bodyItem: T) {
     const headers = new Headers({ 'content-type': 'application/json' });
 
-    const profileData = getData(StorageItems.Profile);
+    let profileData = null;
 
-    if (profileData && profileData.token) {
-        headers.append('Authorization', `Bearer ${profileData.token}`);
+    if (!apiRoutes.toLowerCase().includes('login')) {
+        profileData = getData(StorageItems.Profile);
+
+        if (profileData && profileData.token) {
+            headers.append('Authorization', `Bearer ${profileData.token}`);
+        }
     }
 
     let options = {
@@ -58,16 +62,16 @@ export function fetchData<T>(method: HTTP_METHOD, apiRoutes: APIS | string, body
     }
 
     return fetch(finalPath, options)
-        .then((resp) => {
+        .then(async (resp) => {
             console.log('RESPONSE ', resp);
 
             if (!resp.ok) {
-                // return Promise.reject(resp);
                 throw resp;
             } else {
                 return resp.json();
             }
         }).catch(err => {
+            console.log('ERROR BEFORE ', err);
             const respData = err.json();
             console.log('ERROR ', respData);
 
@@ -138,7 +142,9 @@ let modalReference: Modal | null = null;
 // Reference https://svelte.dev/repl/15d7c21aa036464cb0220af60dde3843?version=3.48.0
 export function triggerModal(options: any) {
     return new Promise(resolve => {
-        modalReference = null;
+        // if (modalReference) {
+        //     modalReference.$destroy();
+        // }
 
         modalReference = new Modal({
             target: document.body,
@@ -148,7 +154,10 @@ export function triggerModal(options: any) {
         modalReference.$on('result', e => {
             resolve(e.detail);
             if (modalReference) {
+                modalReference.hideModal();
                 modalReference.$destroy();
+
+                modalReference = null;
             }
         });
     })

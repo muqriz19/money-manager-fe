@@ -205,6 +205,8 @@
 
 		selectedPagination = selectedPageNumber;
 
+		console.log(tableConfig.api.queries)
+
 		// set up query
 		const queries = JSON.parse(JSON.stringify(tableConfig.api.queries));
 		for (let q = 0; q < queries.length; q++) {

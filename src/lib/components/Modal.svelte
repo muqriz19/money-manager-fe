@@ -39,7 +39,6 @@
 
 			if (buttonModal) {
 				buttonModal.click();
-				console.log('MODAL CONFIG ', modalConfig);
 			}
 		});
 	};
@@ -62,17 +61,20 @@
 		const hideTheModal = modalConfig?.foot?.execute?.hideModal;
 
 		if (command && typeof command === 'function') {
-			command();
+			command(result).then((success) => {
+				if (success) {
+					dispatch('result', result);
 
-			if (hideTheModal) {
-				// hide
-				hideModal();
-			}
+					if (hideTheModal) {
+						// hide
+						hideModal();
+					}
+				}
+			});
 		} else {
 			hideModal();
+			dispatch('result', result);
 		}
-
-		dispatch('result', result);
 	};
 
 	function generateModalId() {

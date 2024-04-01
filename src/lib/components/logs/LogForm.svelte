@@ -48,6 +48,12 @@
 
 		getAllUserCategories(form.userId);
 
+		console.log(form);
+
+		// for edit
+		if (form.categoryId) {
+		}
+
 		validateForm();
 	}
 
@@ -97,7 +103,7 @@
 		});
 	}
 
-	function onCategoryChange($event: any) {
+	function onCategoryChange($event: CustomEvent<Category>) {
 		if ($event.detail) {
 			form.categoryId = $event.detail.id;
 		} else {
@@ -152,7 +158,11 @@
 	<div class="row">
 		<div class="col-6">
 			<div class="mb-3">
-				<CategorySelector categories={allUserCategories} on:selectedCategory={onCategoryChange} />
+				<CategorySelector
+					categories={allUserCategories}
+					on:selectedCategory={onCategoryChange}
+					selectedCategoryId={form.categoryId}
+				/>
 
 				{#if validationErrors.category.message}
 					<div class="alert alert-danger" role="alert">

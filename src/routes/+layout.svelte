@@ -11,6 +11,7 @@
 	import ToastStore from '../stores/ToastStore';
 	import type { ToastType } from 'svelte-toasts/types/common';
 	import type { Unsubscriber } from 'svelte/store';
+	import Footer from '$lib/components/Footer.svelte';
 
 	let unsubscriber: Unsubscriber;
 
@@ -50,6 +51,16 @@
 	</div>
 </div>
 
+<Footer />
+
 <ToastContainer let:data>
 	<FlatToast {data} />
 </ToastContainer>
+
+<style lang="scss">
+	.container {
+		.page-container {
+			margin-bottom: 5rem;
+		}
+	}
+</style>

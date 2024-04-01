@@ -7,7 +7,7 @@ export interface Account {
 }
 
 export interface Category {
-    id?: number;
+    id: number;
     name: string;
     description: string | null;
     createdDate: Date;
@@ -53,7 +53,7 @@ export interface Record {
     createdDate: Date;
     userId: number;
     accountId: number;
-    logs: Log[] | null;
+    logs: Log[];
 }
 
 export interface Log {
@@ -65,6 +65,10 @@ export interface Log {
     userId: number;
     recordId: number;
     categoryId: number;
+}
+
+export interface LogEntry extends Log {
+    isCollapsed: boolean;
 }
 
 export type LoaderType = 'regular';

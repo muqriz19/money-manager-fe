@@ -18,4 +18,4 @@ export interface ModalConfig {
     }
 }
 
-type ModalAction = () => any;
+type ModalAction = (...args: any[]) => Promise<boolean>;
