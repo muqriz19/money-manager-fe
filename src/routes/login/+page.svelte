@@ -86,7 +86,6 @@
 				navigateTo(`/members/${resp.data.userId}/profile`);
 			})
 			.catch((err) => {
-				console.log(err);
 				ToastStore.set({
 					title: 'Error occured',
 					message: err.message,

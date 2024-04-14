@@ -29,3 +29,9 @@ export interface SelectedIcon {
     set: string;
     name: string
 }
+
+export interface SelectOption {
+    label: string;
+    prop: any;
+    value: any;
+}

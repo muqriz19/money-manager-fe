@@ -1,10 +1,18 @@
 <script lang="ts">
-	import type { Category, Log } from '$lib/data/data';
-	import { APIS, HTTP_METHOD, fetchData, getCurrentModalReference } from '$lib/helpers/utils';
+	import { TransactionType, type Category, type Log, type Transaction } from '$lib/data/data';
+	import {
+		APIS,
+		HTTP_METHOD,
+		fetchData,
+		getCurrentModalReference,
+		getEnumsValues
+	} from '$lib/helpers/utils';
 	import { afterUpdate, onMount } from 'svelte';
-	import CategorySelector from '../CategorySelector.svelte';
+	import CategorySelector from './CategorySelector.svelte';
+	import type { SelectOption } from '$lib/data/core';
 
 	export let logData: Log;
+	export let transactionData: Transaction;
 
 	let form = {
 		name: '',
@@ -12,10 +20,15 @@
 		categoryId: <number | null>null,
 		description: null,
 		recordId: 0,
-		userId: 0
+		userId: 0,
+		logId: 0,
+		transactionType: <TransactionType>TransactionType.Income,
+		createdDate: new Date()
 	};
 
 	let isValidForm = false;
+
+	let transactionTypeOptions: SelectOption[] = [];
 
 	const validationErrors = {
 		name: {
@@ -44,11 +57,42 @@
 	}
 
 	function setup() {
-		form = Object.assign(form, logData);
+		initTransactionTypeOption();
 
-		getAllUserCategories(form.userId);
+		if (logData && transactionData === null) {
+			form.recordId = logData.recordId;
+			form.userId = logData.userId;
+			form.logId = logData.id;
+		}
+
+		console.log(transactionData);
+
+		if (transactionData) {
+			form = Object.assign(form, transactionData);
+		}
+
+		const userId = Object.keys(logData).length > 0 ? logData.userId : transactionData.userId;
+
+		console.log(transactionData, logData);
+
+		getAllUserCategories(userId);
 
 		validateForm();
+	}
+
+	function initTransactionTypeOption() {
+		transactionTypeOptions = Object.keys(TransactionType)
+			.filter((type) => !Number.isNaN(Number(type).valueOf()))
+			.map((filteredType) => {
+				const enumNumber = Number(filteredType);
+				const enumString = TransactionType[enumNumber];
+
+				return {
+					label: enumString,
+					prop: enumNumber,
+					value: enumNumber
+				};
+			});
 	}
 
 	function checkForm() {
@@ -73,6 +117,8 @@
 		if (isNaN(form.value) || form.value === null || form.value === undefined) {
 			validationErrors.value.message = 'Value should be a number';
 			isValidForm = false;
+		} else if (form.value < 0) {
+			validationErrors.value.message = 'Value should be greater than zero';
 		} else {
 			validationErrors.value.message = '';
 		}
@@ -106,6 +152,14 @@
 
 		validateForm();
 	}
+
+	function onTransactionTypeSelect($event: any) {
+		const value = Number($event.target.value);
+
+		form.transactionType = value;
+
+		return null;
+	}
 </script>
 
 <form class="form-container">
@@ -136,6 +190,8 @@
 					type="number"
 					class="form-control"
 					id="value"
+					min="0"
+					step="0.01"
 					bind:value={form.value}
 					on:input={() => validateForm()}
 				/>
@@ -152,6 +208,24 @@
 	<div class="row">
 		<div class="col-6">
 			<div class="mb-3">
+				<label for="type" class="form-label">Type</label>
+
+				<select
+					class="form-select"
+					id="type"
+					aria-label="Default select example"
+					value={Number(form.transactionType)}
+					on:change={onTransactionTypeSelect}
+				>
+					{#each transactionTypeOptions as option}
+						<option value={option.value}>{option.label}</option>
+					{/each}
+				</select>
+			</div>
+		</div>
+
+		<div class="col-6">
+			<div class="mb-3">
 				<CategorySelector
 					categories={allUserCategories}
 					on:selectedCategory={onCategoryChange}
@@ -166,6 +240,16 @@
 			</div>
 		</div>
 	</div>
+
+	<!-- <div class="row">
+		<div class="col-6">
+			<div class="mb-3">
+				<label for="createdDate" class="form-label">Date</label>
+
+				<input type="date" id="createdDate" name="createdDate" class="form-control" value="{form.createdDate}"/>
+			</div>
+		</div>
+	</div> -->
 
 	<div class="row">
 		<div class="col-12">

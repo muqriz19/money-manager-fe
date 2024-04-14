@@ -65,9 +65,34 @@ export interface Log {
     userId: number;
     recordId: number;
     categoryId: number;
+    transactions: Transaction[];
+}
+
+export interface Transaction {
+    id: number;
+    name: string;
+    description: string | null;
+    createdDate: Date;
+    value: number;
+    userId: number;
+    logId: number;
+    transactionType: TransactionType;
+    categoryId: number;
+}
+
+export enum TransactionType {
+    Income,
+    Expenses
 }
 
 export interface LogEntry extends Log {
+    isCollapsed: boolean;
+    transactions: TransactionEntry[];
+    totalValueAll: number;
+    isDisplayingTransactions: boolean;
+}
+
+export interface TransactionEntry extends Transaction {
     isCollapsed: boolean;
 }
 

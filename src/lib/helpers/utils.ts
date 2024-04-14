@@ -22,7 +22,8 @@ export enum APIS {
     FORGOT_PASSWORD = "Authorization/ForgotPassword",
     RESET_PASSWORD = "Authorization/ResetPassword",
     RECORDS = "Records",
-    LOGS = "Logs"
+    LOGS = "Logs",
+    TRANSACTIONS = "Transactions"
 }
 
 export interface ResponseBody {
@@ -181,4 +182,27 @@ export function generateRandomId(length: number) {
     }
 
     return randomId;
+}
+
+type EnumValue = "strings" | "numbers";
+export function getEnumsValues(whatType: EnumValue, enums: any): number[] | string[] {
+    const enumNumbers: number[] = [];
+    const enumStrings: string[] = [];
+
+    Object.keys(enums)
+        .filter((type) => !Number.isNaN(Number(type).valueOf()))
+        .map((filteredType) => {
+            const enumNumber = Number(filteredType);
+            const enumString = enums[enumNumber];
+
+            enumNumbers.push(enumNumber);
+            enumStrings.push(enumString);
+        });
+
+    if (whatType === 'numbers') {
+        return enumNumbers
+
+    } else {
+        return enumStrings;
+    }
 }

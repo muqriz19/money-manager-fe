@@ -111,9 +111,6 @@
 	}
 
 	function getCurrentCategory(selectedCategoryId: number | null, categories: Category[]) {
-		console.log(selectedCategoryId);
-		console.log(categories);
-
 		if (selectedCategoryId !== 0 && categories.length >= 1) {
 			const theCategory = categories.find((category) => category.id === selectedCategoryId)!;
 

@@ -1,6 +1,6 @@
 import type { Log } from "$lib/data/data";
 import { writable } from "svelte/store";
 
-const LogsStore = writable<Log | []>();
+const OverviewStore = writable<Log>();
 
-export default LogsStore;
+export default OverviewStore;

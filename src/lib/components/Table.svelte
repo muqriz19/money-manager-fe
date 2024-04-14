@@ -205,8 +205,6 @@
 
 		selectedPagination = selectedPageNumber;
 
-		console.log(tableConfig.api.queries)
-
 		// set up query
 		const queries = JSON.parse(JSON.stringify(tableConfig.api.queries));
 		for (let q = 0; q < queries.length; q++) {
@@ -277,11 +275,8 @@
 	};
 
 	const deleteMethod = (data: any, functionCode: Function, refreshTable: boolean) => {
-		console.log(data, functionCode, refreshTable);
-
 		if (functionCode) {
 			executeCode(data, functionCode).then((apiSuccess) => {
-				console.log(refreshTable, apiSuccess);
 				if (refreshTable && apiSuccess) {
 					refresh();
 				}

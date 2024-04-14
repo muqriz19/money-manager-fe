@@ -135,8 +135,6 @@
 								deleteRow: async (rowData: any) => {
 									const id = rowData.id;
 									const path = `${APIS.ACCOUNTS}/${id}`;
-									console.log(rowData);
-									console.log(path);
 
 									const confirmed = await triggerModal({ modalConfig });
 

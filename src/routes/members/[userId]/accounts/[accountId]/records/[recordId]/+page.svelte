@@ -1,13 +1,16 @@
 <script lang="ts">
-	import type { Log, ProfileData, Record } from '$lib/data/data';
+	import type { Log, ProfileData, Record, Transaction } from '$lib/data/data';
 	import { APIS, HTTP_METHOD, fetchData, triggerModal } from '$lib/helpers/utils';
 	import { onMount } from 'svelte';
 	import ProfileStore from '../../../../../../../stores/ProfileStore';
 	import type { ModalConfig } from '$lib/data/modal';
 	import LogForm from '$lib/components/logs/LogForm.svelte';
 	import ToastStore from '../../../../../../../stores/ToastStore';
-	import LogsSpace from '$lib/components/logs/LogsSpace.svelte';
 	import Confirmation from '$lib/components/Confirmation.svelte';
+	import TransactionForm from '$lib/components/TransactionForm.svelte';
+	import SpaceField from '$lib/components/logs/SpaceField.svelte';
+	import { SpaceItem, type SpaceAction, type SpaceActions } from '$lib/data/space';
+	import Overview from '$lib/components/Overview.svelte';
 
 	export let data: any;
 
@@ -34,8 +37,6 @@
 	let totalValue = 0;
 
 	onMount(() => {
-		console.log(data);
-
 		ids.userId = Number(data.userId);
 		ids.accountId = Number(data.accountId);
 		ids.id = Number(data.recordId);
@@ -65,8 +66,6 @@
 				};
 
 				recordData.logs = recordData.logs;
-
-				console.log(recordData);
 			}
 		});
 	}
@@ -122,7 +121,7 @@
 
 					if (resp) {
 						const currentLogs = recordData?.logs ? [...recordData?.logs] : [];
-						const allLogs: Log[] = [...currentLogs, log];
+						const allLogs: Log[] = [...currentLogs, resp.data];
 						recordData.logs = allLogs;
 
 						recordData.logs = recordData.logs;
@@ -142,7 +141,7 @@
 		});
 	}
 
-	async function deleteLog($event: CustomEvent<Log>) {
+	async function onDeleteLog(log: Log) {
 		modalConfig = {
 			foot: {
 				cancel: {},
@@ -161,8 +160,7 @@
 
 		const confirmed = await triggerModal({ modalConfig });
 		if (confirmed) {
-			const currentLog = $event.detail as Log;
-			const id = currentLog.id;
+			const id = log.id;
 			const path = `${APIS.LOGS}/${id}`;
 
 			return new Promise((resolve) => {
@@ -190,34 +188,6 @@
 					});
 			});
 		}
-	}
-
-	async function editLog($event: CustomEvent<Log>) {
-		const theLog = $event.detail as Log;
-
-		modalConfig = {
-			foot: {
-				cancel: {},
-				execute: {
-					hideModal: true,
-					text: 'Update',
-					command: updateLog
-				}
-			},
-			head: {
-				title: 'Edit Log'
-			},
-			body: {
-				component: LogForm,
-				props: {
-					logData: {
-						...theLog
-					}
-				}
-			}
-		};
-
-		openLogFormModal();
 	}
 
 	function updateLog(log: Log): Promise<boolean> {
@@ -262,8 +232,231 @@
 		});
 	}
 
+	function onTransactionForm(operation: SpaceActions, log: Log, transaction: Transaction) {
+		modalConfig = {
+			foot: {
+				cancel: {},
+				execute: {
+					hideModal: true,
+					text: 'Save',
+					command: undefined
+				}
+			},
+			head: {
+				title: operation === 'add' ? 'Add Transaction' : 'Edit Transaction'
+			},
+			body: {
+				component: TransactionForm,
+				props: {
+					logData: {
+						...log
+					},
+					transactionData: operation === 'add' ? null : { ...transaction }
+				}
+			}
+		};
+
+		if (operation === 'add') {
+			modalConfig.foot.execute!.command = createTransaction;
+		}
+
+		if (operation === 'edit') {
+			modalConfig.foot.execute!.command = updateTransaction;
+		}
+
+		openLogFormModal();
+	}
+
+	function createTransaction(transaction: Transaction): Promise<boolean> {
+		const url = `${APIS.TRANSACTIONS}/`;
+
+		return new Promise((resolve) => {
+			fetchData(HTTP_METHOD.POST, url, transaction)
+				.then((resp) => {
+					ToastStore.set({
+						message: resp.message,
+						title: 'Created Transaction',
+						type: 'success'
+					});
+
+					if (resp) {
+						const thatLog = recordData.logs.find((log) => log.id == resp.data.logId);
+
+						if (thatLog) {
+							thatLog?.transactions.push(resp.data);
+							const index = recordData.logs.findIndex((log) => log.id === thatLog.id);
+
+							recordData.logs[index] = thatLog;
+						}
+
+						recordData.logs = recordData.logs;
+
+						resolve(true);
+					}
+				})
+				.catch((err) => {
+					ToastStore.set({
+						title: 'Error occured',
+						message: err.message,
+						type: 'error'
+					});
+
+					resolve(false);
+				});
+		});
+	}
+
+	function updateTransaction(transaction: Transaction): Promise<boolean> {
+		const url = `${APIS.TRANSACTIONS}/`;
+
+		return new Promise((resolve) => {
+			fetchData(HTTP_METHOD.PUT, url, transaction)
+				.then((resp) => {
+					ToastStore.set({
+						message: resp.message,
+						title: 'Updated Transaction',
+						type: 'success'
+					});
+
+					if (resp) {
+						const logIndex = recordData.logs.findIndex((log) => log.id == resp.data.logId);
+
+						if (logIndex > -1) {
+							const transactionIndex = recordData.logs[logIndex].transactions.findIndex(
+								(transaction) => transaction.id === resp.data.id
+							);
+
+							recordData.logs[logIndex].transactions[transactionIndex] = resp.data;
+						}
+
+						recordData.logs = recordData.logs;
+
+						resolve(true);
+					}
+				})
+				.catch((err) => {
+					ToastStore.set({
+						title: 'Error occured',
+						message: err.message,
+						type: 'error'
+					});
+
+					resolve(false);
+				});
+		});
+	}
+
+	async function onDeleteTransaction(transaction: Transaction) {
+		modalConfig = {
+			foot: {
+				cancel: {},
+				execute: {
+					hideModal: true
+				}
+			},
+			head: {
+				title: 'Delete Transaction?'
+			},
+			body: {
+				component: Confirmation,
+				props: {
+					message: 'You are about to delete this transaction, are you sure you want to do that?'
+				}
+			}
+		};
+
+		const confirmed = await triggerModal({ modalConfig });
+
+		if (confirmed) {
+			const id = transaction.id;
+			const path = `${APIS.TRANSACTIONS}/${id}`;
+
+			return new Promise((resolve) => {
+				fetchData(HTTP_METHOD.DELETE, path, null)
+					.then((resp) => {
+						ToastStore.set({
+							message: 'Successful in deleting transaction',
+							title: 'Success',
+							type: 'success'
+						});
+
+						let indexLog = recordData.logs.findIndex((theLog) => theLog.id === transaction.logId);
+						let indexTransaction = recordData.logs[indexLog].transactions.findIndex(
+							(theTransaction) => theTransaction.id === id
+						);
+						recordData.logs[indexLog].transactions.splice(indexTransaction, 1);
+
+						recordData.logs = recordData.logs;
+
+						resolve(true);
+					})
+					.catch((err) => {
+						ToastStore.set({
+							message: err,
+							title: 'Error occured',
+							type: 'error'
+						});
+						resolve(false);
+					});
+			});
+		}
+	}
+
 	function getTotalValue($event: CustomEvent<number>) {
 		totalValue = $event.detail;
+	}
+
+	async function onSpaceAction($event: CustomEvent<SpaceAction>) {
+		const spaceAction = $event.detail;
+
+		if (spaceAction.item === SpaceItem.Log) {
+			const log = spaceAction.data.log as Log;
+
+			modalConfig = {
+				foot: {
+					cancel: {},
+					execute: {
+						hideModal: true,
+						text: 'Save',
+						command: undefined
+					}
+				},
+				head: {
+					title: 'Log'
+				},
+				body: {
+					component: LogForm,
+					props: {
+						logData: {
+							...log
+						}
+					}
+				}
+			};
+
+			if (spaceAction.action === 'edit') {
+				modalConfig.head.title = 'Edit Log';
+
+				modalConfig.foot.execute!.command = updateLog;
+
+				openLogFormModal();
+			}
+
+			if (spaceAction.action == 'delete') {
+				onDeleteLog(log);
+			}
+		}
+
+		if (spaceAction.item === SpaceItem.Transaction) {
+			const transaction = spaceAction.data.transaction as Transaction;
+			const log = spaceAction.data.log as Log;
+
+			if (spaceAction.action !== 'delete') {
+				onTransactionForm(spaceAction.action, log, transaction);
+			} else {
+				onDeleteTransaction(transaction);
+			}
+		}
 	}
 </script>
 
@@ -296,19 +489,20 @@
 			</div>
 
 			<div class="row">
-				<div class="col-12">
-					
-				</div>
+				<div class="col-12" />
 			</div>
 
 			<div class="row">
-				<div class="col-sm-12 col-md-12 col-lg-12">
-					<LogsSpace
+				<div class="col-sm-12 col-md-6 col-lg-6">
+					<SpaceField
 						logs={recordData.logs}
-						on:delete={deleteLog}
-						on:edit={editLog}
+						on:action={onSpaceAction}
 						on:total-log-value={getTotalValue}
 					/>
+				</div>
+
+				<div class="col-sm-12 col-md-6 col-lg-6">
+					<Overview></Overview>
 				</div>
 			</div>
 		</div>
