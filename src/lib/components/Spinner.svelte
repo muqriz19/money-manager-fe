@@ -2,7 +2,7 @@
 	import type { LoaderType } from '$lib/data/data';
 
 	export let loaderType: LoaderType = 'regular';
-    export let color = "#23c723";
+	export let color = '#23c723';
 </script>
 
 {#if loaderType === 'regular'}

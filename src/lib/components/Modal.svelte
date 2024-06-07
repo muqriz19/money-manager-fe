@@ -78,7 +78,7 @@
 	};
 
 	function generateModalId() {
-		return new Promise<string>(async (resolve) => {
+		return new Promise<string>((resolve) => {
 			let modalId = generateRandomId(5);
 
 			finalModalId = modalId;

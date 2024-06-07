@@ -16,14 +16,26 @@
 			<div class="col-3">
 				<div class="mb-3">
 					<label for="name" class="form-label">Name</label>
-					<input type="text" id="name" class="form-control" readonly value={currentProfileData.name} />
+					<input
+						type="text"
+						id="name"
+						class="form-control"
+						readonly
+						value={currentProfileData.name}
+					/>
 				</div>
 			</div>
 
 			<div class="col-3">
 				<div class="mb-3">
 					<label for="email" class="form-label">Email address</label>
-					<input type="text" id="email" class="form-control" readonly value={currentProfileData.email} />
+					<input
+						type="text"
+						id="email"
+						class="form-control"
+						readonly
+						value={currentProfileData.email}
+					/>
 				</div>
 			</div>
 

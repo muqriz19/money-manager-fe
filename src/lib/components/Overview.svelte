@@ -2,10 +2,11 @@
 	import { onMount } from 'svelte';
 	import OverviewStore from '../../stores/OverviewStore';
 	import { debounce } from '$lib/helpers/utils';
-	import { TransactionType, type Log } from '$lib/data/data';
+	import { TransactionType, type LogDto } from '$lib/data/data';
+	import ChartJs from 'chart.js/auto';
 
 	let isOverviewOpen = false;
-	let log: Log;
+	let log: LogDto;
 
 	function offOverview() {
 		isOverviewOpen = false;
@@ -26,7 +27,7 @@
 		setupTransactionType(log);
 	}
 
-	function setupTransactionType(log: Log) {
+	function setupTransactionType(log: LogDto) {
 		let totalExpense = 0;
 		let totalIncome = 0;
 
@@ -44,7 +45,28 @@
 		barMap.set(TransactionType.Expenses, { label: 'Expenses', value: totalExpense });
 		barMap.set(TransactionType.Income, { label: 'Income', value: totalIncome });
 
-		const TESTER = document.getElementById('tester');
+		console.log(barMap);
+
+		const TESTER = document.getElementById('transactionTypeChart') as HTMLCanvasElement;
+
+		new ChartJs(TESTER, {
+			type: 'pie',
+			data: {
+				labels: [
+					barMap.get(TransactionType.Expenses).label,
+					barMap.get(TransactionType.Income).label
+				],
+				datasets: [
+					{
+						data: [
+							barMap.get(TransactionType.Expenses).value,
+							barMap.get(TransactionType.Income).value
+						],
+						backgroundColor: ['red', 'green']
+					}
+				]
+			}
+		});
 	}
 </script>
 
@@ -62,7 +84,7 @@
 	<div class="middle-bar">
 		{#if isOverviewOpen}
 			<div class="block-table">
-				<div id="tester" style="width:600px;height:250px;" />
+				<canvas id="transactionTypeChart" style="height:250px;" />
 			</div>
 		{:else}
 			<p class="text-center">Select a log to view information about it</p>
@@ -80,19 +102,5 @@
 		.top-bar {
 			text-align: center;
 		}
-
-		.middle-bar {
-		}
-
-		// &::before {
-		// 	content: '';
-		// 	width: 0;
-		// 	height: 0;
-		// 	border-top: 10px solid transparent;
-		// 	border-bottom: 10px solid transparent;
-		// 	border-right: 20px solid $yellow-color;
-		// 	position: absolute;
-		// 	left: -20px;
-		// }
 	}
 </style>

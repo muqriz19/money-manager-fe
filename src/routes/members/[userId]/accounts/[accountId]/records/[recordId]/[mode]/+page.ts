@@ -1,3 +1,3 @@
-export const load = ({fetch, params}) => {
-    return params;
-}
+export const load = ({ params }) => {
+	return params;
+};

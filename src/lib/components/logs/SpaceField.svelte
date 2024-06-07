@@ -2,8 +2,10 @@
 	import {
 		TransactionType,
 		type Log,
+		type LogDto,
 		type LogEntry,
 		type Transaction,
+		type TransactionDto,
 		type TransactionEntry
 	} from '$lib/data/data';
 	import { SpaceItem, type SpaceActions, type SpaceAction } from '$lib/data/space';
@@ -16,12 +18,32 @@
 
 	const dispatchActionIndentifier = 'action';
 
-	export let logs: Log[] = [];
+	export let logs: LogDto[] = [];
 	let logEntries: LogEntry[] = [];
 
 	function returnLog(logEntry: LogEntry): Log {
-		const logs: Log[] = logEntries.map((entry) => {
+		const allLogs: Log[] = logEntries.map((entry) => {
 			let newLog: Log = {
+				categoryId: entry.category.id,
+				createdDate: entry.createdDate,
+				description: entry.description,
+				id: entry.id,
+				name: entry.name,
+				recordId: entry.recordId,
+				userId: entry.userId,
+				value: entry.value
+			};
+
+			return newLog;
+		});
+
+		return allLogs.find((log) => log.id === logEntry.id)!;
+	}
+
+	function returnLogDto(logEntry: LogEntry): LogDto {
+		const allLogs: LogDto[] = logEntries.map((entry) => {
+			let newLog: LogDto = {
+				category: entry.category,
 				categoryId: entry.categoryId,
 				createdDate: entry.createdDate,
 				description: entry.description,
@@ -36,13 +58,13 @@
 			return newLog;
 		});
 
-		return logs.find((log) => log.id === logEntry.id)!;
+		return allLogs.find((log) => log.id === logEntry.id)!;
 	}
 
-	function returnTransaction(transactionEntry: TransactionEntry): Transaction {
-		const newTransaction: Transaction = {
+	function returnTransaction(transactionEntry: TransactionEntry): TransactionDto {
+		const newTransaction: TransactionDto = {
 			id: transactionEntry.id,
-			categoryId: transactionEntry.categoryId,
+			categoryId: transactionEntry.category.id,
 			createdDate: transactionEntry.createdDate,
 			description: transactionEntry.description,
 			logId: transactionEntry.logId,
@@ -95,9 +117,9 @@
 		return null;
 	}
 
-	function convertLogsToLogEntries(logs: Log[]) {
+	function convertLogsToLogEntries(logs: LogDto[]) {
 		const allEntries = logs.map((log) => {
-			const transactionTotal = calculateTotalAll(log.transactions);
+			const transactionTotal = calculateTotalAll(log.value, log.transactions);
 
 			return {
 				...log,
@@ -147,13 +169,15 @@
 			total = total + logEntry.value;
 		});
 
-		console.log('LOG TOTAL ', total);
-
 		dispatchValue('total-log-value', total);
 	}
 
-	function calculateTotalAll(allTransactions: Transaction[]) {
+	function calculateTotalAll(logValue: number, allTransactions: Transaction[]) {
 		let value = 0;
+
+		if (allTransactions.length > 0) {
+			value = logValue;
+		}
 
 		allTransactions.forEach((transaction) => {
 			if (transaction.transactionType === TransactionType.Income) {
@@ -167,7 +191,7 @@
 	}
 
 	function overviewLog(logEntry: LogEntry) {
-		OverviewStore.set(returnLog(logEntry));
+		OverviewStore.set(returnLogDto(logEntry));
 		return null;
 	}
 
@@ -211,7 +235,10 @@
 
 		<button type="button" class="space-box" on:click={toggleLog(logEntry)}>
 			<div class="icon">
-				<MyIcon iconSet={{ set: 'bootstrapIcons', name: 'question-circle' }} />
+				<MyIcon
+					iconSet={{ set: logEntry.category.iconSet, name: logEntry.category.iconName }}
+					extraClass="ignoreIconOption"
+				/>
 			</div>
 
 			<div class="info">
@@ -220,12 +247,17 @@
 						{logEntry.name}
 					</span>
 
-					<span>
-						{logEntry.value}/{logEntry.totalValueAll}
-					</span>
-					<span>
-						= {logEntry.value + logEntry.totalValueAll}
-					</span>
+					<div class="value-container">
+						<span class="value">
+							{logEntry.value}
+						</span>
+
+						=
+
+						<span class="value" title="Balance">
+							{logEntry.totalValueAll}
+						</span>
+					</div>
 				</div>
 
 				<hr />
@@ -282,7 +314,13 @@
 						on:click={toggleTransaction(transactionEntry)}
 					>
 						<div class="icon">
-							<MyIcon iconSet={{ set: 'bootstrapIcons', name: 'question-circle' }} />
+							<MyIcon
+								iconSet={{
+									set: transactionEntry.category.iconSet,
+									name: transactionEntry.category.iconName
+								}}
+								extraClass="ignoreIconOption"
+							/>
 						</div>
 
 						<div class="info">
@@ -291,9 +329,11 @@
 									{transactionEntry.name}
 								</span>
 
-								<span>
-									{transactionEntry.value}
-								</span>
+								<div class="value-container">
+									<span class="value">
+										{transactionEntry.value}
+									</span>
+								</div>
 							</div>
 
 							<hr />
@@ -339,11 +379,24 @@
 			display: flex;
 			flex: 1;
 
+			.value-container {
+				.value {
+					@include value;
+				}
+			}
+
 			span:first-child {
 				flex-grow: 1;
 				text-align: left;
 			}
 		}
+	}
+
+	@mixin value {
+		padding: 5px;
+		border-radius: 5px;
+		font-weight: 600;
+		background-color: $white-color;
 	}
 
 	.log-space-wrapper {

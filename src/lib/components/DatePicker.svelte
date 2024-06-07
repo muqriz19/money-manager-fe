@@ -5,8 +5,6 @@
 
 	import localeEn from 'air-datepicker/locale/en';
 
-    
-
 	onMount(() => {
 		init();
 	});
@@ -17,9 +15,8 @@
 		const datePicker = new AirDatepicker('#datePicker', {
 			locale: defaultLocale,
 
-            onSelect: (date) => {
-            }
-		})
+			onSelect: (date) => {}
+		});
 	}
 </script>
 

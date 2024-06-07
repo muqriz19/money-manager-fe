@@ -213,7 +213,11 @@
 
 		<div class="mb-3">
 			<label for="description" class="form-label">Icon</label>
-			<IconPicker on:iconChanged={onIconChanged} selectedIcon={form?.icon} bind:this={iconPickerComponent}/>
+			<IconPicker
+				on:iconChanged={onIconChanged}
+				selectedIcon={form?.icon}
+				bind:this={iconPickerComponent}
+			/>
 
 			{#if validationErrors.icon.message !== ''}
 				<div class="alert alert-danger" role="alert">{validationErrors.icon.message}</div>

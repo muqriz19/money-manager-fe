@@ -1,17 +1,17 @@
-import type { Log, Transaction } from "./data";
+import type { Log, LogDto, Transaction, TransactionDto } from './data';
 
 export type SpaceActions = 'add' | 'delete' | 'edit';
 
 export enum SpaceItem {
-    Log,
-    Transaction
+	Log,
+	Transaction
 }
 
 export interface SpaceAction {
-    data: {
-        log: Log | null;
-        transaction: Transaction | null;
-    };
-    item: SpaceItem;
-    action: SpaceActions;
+	data: {
+		log: Log | null;
+		transaction: TransactionDto | null;
+	};
+	item: SpaceItem;
+	action: SpaceActions;
 }

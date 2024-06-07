@@ -3,7 +3,7 @@
 	import { debounce } from '$lib/helpers/utils';
 	import * as bootstrapIcons from 'bootstrap-icons/font/bootstrap-icons.json';
 	import { createEventDispatcher, onMount } from 'svelte';
-	import { createIcons, icons as lucideIcons } from 'lucide';
+	import { icons as lucideIcons } from 'lucide';
 	import { createLucideIcons } from '$lib/helpers/ui';
 
 	let iconList: IconSet[] = [];
@@ -154,7 +154,7 @@
 	}
 
 	function searchIconSet($event: any) {
-		debounce(500, () => {
+		debounce(200, () => {
 			const query = String($event.target.value).toLowerCase();
 
 			if (currentIconSet) {
@@ -162,13 +162,15 @@
 					return ref.toLowerCase().includes(query);
 				});
 
-				currentIcons = foundIcons;
-
 				if (query === '') {
-					currentIcons = currentIconSet.icons;
+					currentIcons = currentIconSet!.icons;
+				} else {
+					currentIcons = foundIcons;
 				}
 
-				activateLucideIcons();
+				debounce(200, () => {
+					activateLucideIcons();
+				});
 			}
 		});
 	}
@@ -214,7 +216,7 @@
 
 	function activateLucideIcons() {
 		if (currentIconSet && currentIconSet.set === 'lucideIcons') {
-			createLucideIcons(0);
+			createLucideIcons(500);
 		}
 	}
 
@@ -242,7 +244,11 @@
 						{/if}
 
 						{#if selectedIcon?.set === 'lucideIcons'}
-							<i data-lucide={selectedIcon?.name} class="iconSet" title={selectedIcon?.set} />
+							<i
+								data-lucide={selectedIcon?.name}
+								class="lucide iconSet ignore"
+								title={selectedIcon?.set}
+							/>
 						{/if}
 					{/if}
 
@@ -312,7 +318,7 @@
 
 				{#if currentIconSet.set === 'lucideIcons'}
 					{#if currentIcons.length > 0}
-						{#each currentIcons as icon}
+						{#each currentIcons as icon (icon)}
 							<button type="button" class="btn iconSet" on:click={selectTheIcon(icon)} title={icon}>
 								<i data-lucide={icon} data-icon-set={currentIconSet?.set} />
 							</button>

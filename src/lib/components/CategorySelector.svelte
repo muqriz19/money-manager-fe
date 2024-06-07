@@ -74,13 +74,17 @@
 		if (inputSearch === '') {
 			filteredCategories = categories;
 		} else {
-			filteredCategories = categories.filter((category) => {
-				return category.name.toLowerCase().match(inputSearch.toLowerCase());
-			});
+			filteredCategories = [
+				...categories.filter((category) => {
+					return category.name.toLowerCase().match(inputSearch.toLowerCase());
+				})
+			];
 		}
 
+		console.log(filteredCategories);
+
 		clearAnyLucideIcons({ ignoreClass: ['ignoreIcon'] }).then(() => {
-			createLucideIcons(300);
+			createLucideIcons(1000);
 		});
 	}
 

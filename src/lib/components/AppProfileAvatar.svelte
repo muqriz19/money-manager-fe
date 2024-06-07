@@ -26,15 +26,14 @@
 			path: '/login',
 			name: 'Logout',
 			command: ($event: any) => {
-				ProfileStore.set(null);
-				clearStorage();
+				logOut();
 			}
 		}
 	];
 
 	let allAllowedLinks: RouteItem[] = [];
 
-	let currentProfileData: ProfileData;
+	let currentProfileData: ProfileData | null;
 
 	onMount(() => {
 		init();
@@ -91,6 +90,12 @@
 			dropdown.visible = true;
 		});
 	}
+
+	function logOut() {
+		ProfileStore.set(null);
+		clearStorage();
+		currentProfileData = null;
+	}
 </script>
 
 <div class="dropdown">
@@ -109,7 +114,7 @@
 		style="left: {dropdown.x}px; visibility: {dropdown.visible ? 'visible' : 'hidden'}"
 	>
 		{#if currentProfileData && currentProfileData?.name}
-			<li><a class="dropdown-item" href="#">Hello, {currentProfileData.name}</a></li>
+			<li><div class="dropdown-item">Hello, {currentProfileData.name}</div></li>
 		{/if}
 
 		{#each allAllowedLinks as link}

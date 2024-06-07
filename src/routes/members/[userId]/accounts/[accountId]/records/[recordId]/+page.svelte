@@ -1,5 +1,12 @@
 <script lang="ts">
-	import type { Log, ProfileData, Record, Transaction } from '$lib/data/data';
+	import type {
+		Log,
+		LogDto,
+		ProfileData,
+		Record,
+		Transaction,
+		TransactionDto
+	} from '$lib/data/data';
 	import { APIS, HTTP_METHOD, fetchData, triggerModal } from '$lib/helpers/utils';
 	import { onMount } from 'svelte';
 	import ProfileStore from '../../../../../../../stores/ProfileStore';
@@ -121,7 +128,7 @@
 
 					if (resp) {
 						const currentLogs = recordData?.logs ? [...recordData?.logs] : [];
-						const allLogs: Log[] = [...currentLogs, resp.data];
+						const allLogs: LogDto[] = [...currentLogs, resp.data];
 						recordData.logs = allLogs;
 
 						recordData.logs = recordData.logs;
@@ -141,7 +148,7 @@
 		});
 	}
 
-	async function onDeleteLog(log: Log) {
+	async function onDeleteLog(logId: number) {
 		modalConfig = {
 			foot: {
 				cancel: {},
@@ -160,8 +167,7 @@
 
 		const confirmed = await triggerModal({ modalConfig });
 		if (confirmed) {
-			const id = log.id;
-			const path = `${APIS.LOGS}/${id}`;
+			const path = `${APIS.LOGS}/${logId}`;
 
 			return new Promise((resolve) => {
 				fetchData(HTTP_METHOD.DELETE, path, null)
@@ -172,7 +178,7 @@
 							type: 'success'
 						});
 
-						let indexLog = recordData.logs.findIndex((theLog) => theLog.id === id);
+						let indexLog = recordData.logs.findIndex((theLog) => theLog.id === logId);
 						recordData.logs.splice(indexLog, 1);
 						recordData.logs = recordData.logs;
 
@@ -196,6 +202,8 @@
 		return new Promise((resolve) => {
 			fetchData(HTTP_METHOD.PUT, url, log)
 				.then((resp) => {
+					console.log('Log Update ', resp);
+
 					ToastStore.set({
 						message: resp.message,
 						title: 'Updated Log',
@@ -212,7 +220,7 @@
 							currentLogs[index] = resp.data;
 						}
 
-						const allLogs: Log[] = [...currentLogs];
+						const allLogs: LogDto[] = [...currentLogs];
 						recordData.logs = allLogs;
 
 						recordData.logs = recordData.logs;
@@ -232,7 +240,7 @@
 		});
 	}
 
-	function onTransactionForm(operation: SpaceActions, log: Log, transaction: Transaction) {
+	function onTransactionForm(operation: SpaceActions, log: LogDto, transaction: TransactionDto) {
 		modalConfig = {
 			foot: {
 				cancel: {},
@@ -346,7 +354,7 @@
 		});
 	}
 
-	async function onDeleteTransaction(transaction: Transaction) {
+	async function onDeleteTransaction(transaction: TransactionDto) {
 		modalConfig = {
 			foot: {
 				cancel: {},
@@ -410,7 +418,7 @@
 		const spaceAction = $event.detail;
 
 		if (spaceAction.item === SpaceItem.Log) {
-			const log = spaceAction.data.log as Log;
+			const log = spaceAction.data.log as LogDto;
 
 			modalConfig = {
 				foot: {
@@ -443,13 +451,13 @@
 			}
 
 			if (spaceAction.action == 'delete') {
-				onDeleteLog(log);
+				onDeleteLog(log.id);
 			}
 		}
 
 		if (spaceAction.item === SpaceItem.Transaction) {
-			const transaction = spaceAction.data.transaction as Transaction;
-			const log = spaceAction.data.log as Log;
+			const transaction = spaceAction.data.transaction as TransactionDto;
+			const log = spaceAction.data.log as LogDto;
 
 			if (spaceAction.action !== 'delete') {
 				onTransactionForm(spaceAction.action, log, transaction);
@@ -488,23 +496,27 @@
 				</div>
 			</div>
 
-			<div class="row">
-				<div class="col-12" />
-			</div>
+			{#if recordData.logs.length > 0}
+				<div class="row">
+					<div class="col-sm-12 col-md-6 col-lg-6">
+						<SpaceField
+							logs={recordData.logs}
+							on:action={onSpaceAction}
+							on:total-log-value={getTotalValue}
+						/>
+					</div>
 
-			<div class="row">
-				<div class="col-sm-12 col-md-6 col-lg-6">
-					<SpaceField
-						logs={recordData.logs}
-						on:action={onSpaceAction}
-						on:total-log-value={getTotalValue}
-					/>
+					<!-- <div class="col-sm-12 col-md-6 col-lg-6">
+						<Overview />
+					</div> -->
 				</div>
-
-				<div class="col-sm-12 col-md-6 col-lg-6">
-					<Overview></Overview>
+			{:else}
+				<div class="row">
+					<div class="col-sm-12 col-md-6 col-lg-6">
+						<p class="p-0">This record has no logs, consider adding one.</p>
+					</div>
 				</div>
-			</div>
+			{/if}
 		</div>
 	</div>
 </div>

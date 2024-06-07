@@ -136,6 +136,7 @@
 					type="number"
 					class="form-control"
 					id="value"
+					step="0.01"
 					bind:value={form.value}
 					on:input={() => validateForm()}
 				/>

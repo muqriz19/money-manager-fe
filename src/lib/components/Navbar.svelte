@@ -4,7 +4,7 @@
 
 	import icon from '$lib/assets/icons/money-manager-icon.svg';
 	import AppProfileAvatar from './AppProfileAvatar.svelte';
-	import { onDestroy, onMount } from 'svelte';
+	import { onMount } from 'svelte';
 	import ProfileStore from '../../stores/ProfileStore';
 	import type { ProfileData } from '$lib/data/data';
 

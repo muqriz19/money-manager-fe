@@ -78,7 +78,8 @@
 			description,
 			createdDate,
 			userId: form.userId,
-			accountId: form.accountId
+			accountId: form.accountId,
+			logs: []
 		};
 
 		return finalForm;

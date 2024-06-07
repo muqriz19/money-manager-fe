@@ -125,8 +125,7 @@
 										iTagWrapper.appendChild(iTag);
 
 										return iTagWrapper;
-									}				
-									else {
+									} else {
 										return '';
 									}
 								}

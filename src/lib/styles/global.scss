@@ -1,184 +1,184 @@
 @font-face {
-    font-family: myFirstFont;
-    src: url('../styles/exo_2/static/Exo2-Regular.ttf');
+	font-family: myFirstFont;
+	src: url('../styles/exo_2/static/Exo2-Regular.ttf');
 }
 
 * {
-    font-family: myFirstFont;
-    font-size: 100%;
+	font-family: myFirstFont;
+	font-size: 100%;
 }
 
 body,
 html {
-    margin: 0;
-    padding: 0;
+	margin: 0;
+	padding: 0;
 }
 
 .mm-btn {
-    border: 1px solid $green-color-alt;
-    background-color: $green-color-alt;
-    color: $white-color;
+	border: 1px solid $green-color-alt;
+	background-color: $green-color-alt;
+	color: $white-color;
 
-    border-radius: 5px;
+	border-radius: 5px;
 }
 
 .mm-btn:hover {
-    background-color: $green-color;
+	background-color: $green-color;
 }
 
 .icon {
-    height: 32px;
+	height: 32px;
 }
 
 .btn {
-    background-color: $green-color-alt;
-    border: 1px solid $green-color-alt;
+	background-color: $green-color-alt;
+	border: 1px solid $green-color-alt;
 
-    &:hover {
-        background-color: $green-color-alt;
-        border: 1px solid $green-color-alt;
-    }
+	&:hover {
+		background-color: $green-color-alt;
+		border: 1px solid $green-color-alt;
+	}
 }
 
 .fab {
-    position: absolute;
-    top: -5px;
-    right: -5px;
-    height: 16px;
-    border: 1px solid $grey-color;
-    border-radius: 360px;
-    width: 16px;
-    background-color: $white-color;
+	position: absolute;
+	top: -5px;
+	right: -5px;
+	height: 16px;
+	border: 1px solid $grey-color;
+	border-radius: 360px;
+	width: 16px;
+	background-color: $white-color;
 
-    display: flex;
-    justify-content: center;
-    align-items: center;
+	display: flex;
+	justify-content: center;
+	align-items: center;
 
-    &:hover {
-        background-color: $green-color-alt;
+	&:hover {
+		background-color: $green-color-alt;
 
-        i {
-            color: $white-color;
-        }
-    }
+		i {
+			color: $white-color;
+		}
+	}
 
-    i {
-        font-size: 14px;
-        display: flex;
-    }
+	i {
+		font-size: 14px;
+		display: flex;
+	}
 }
 
 .small-text {
-    font-size: 10px;
+	font-size: 10px;
 }
 
 @mixin iconSetStandard {
-    border-radius: 5px;
-    padding: 5px;
-    text-align: center;
-    background-color: $white-color;
-    border: 1px solid $grey-color;
+	border-radius: 5px;
+	padding: 5px;
+	text-align: center;
+	background-color: $white-color;
+	border: 1px solid $grey-color;
 
-    &:hover {
-        cursor: pointer;
-        background-color: $green-color;
-        color: $white-color;
-    }
+	&:hover {
+		cursor: pointer;
+		background-color: $green-color;
+		color: $white-color;
+	}
 }
 
 .iconSet {
-    @include iconSetStandard();
+	@include iconSetStandard();
 }
 
 button.iconSet {
-    height: 64px;
-    width: 64px;
+	height: 64px;
+	width: 64px;
 
-    @include iconSetStandard();
+	@include iconSetStandard();
 }
 
-i[data-icon-set*=bootstrapIcons].iconSet {
-    font-size: 32px;
+i[data-icon-set*='bootstrapIcons'].iconSet {
+	font-size: 32px;
 
-    @include iconSetStandard();
+	@include iconSetStandard();
 }
 
 @mixin lucideStandardSize {
-    width: 16px !important;
-    height: 16px !important;
+	width: 16px !important;
+	height: 16px !important;
 }
 
-button>svg.lucide {
-    @include lucideStandardSize();
+button > svg.lucide {
+	@include lucideStandardSize();
 }
 
-i[data-icon-set*=lucideIcons].iconSet svg.lucide {
-    @include lucideStandardSize();
+i[data-icon-set*='lucideIcons'].iconSet svg.lucide {
+	@include lucideStandardSize();
 }
 
 .page {
-    margin-top: 1rem;
+	margin-top: 1rem;
 }
 
 @mixin borderStyle {
-    border-radius: 5px;
-    border: 1px solid $grey-color;
+	border-radius: 5px;
+	border: 1px solid $grey-color;
 }
 
 @mixin defaultStyle {
-    padding: 1rem;
+	padding: 1rem;
 }
 
 .page-container {
-    display: flex;
-    flex-direction: column;
-    gap: 1rem;
+	display: flex;
+	flex-direction: column;
+	gap: 1rem;
 
-    .top {
-        @include defaultStyle();
-        @include borderStyle();
+	.top {
+		@include defaultStyle();
+		@include borderStyle();
 
-        .meta {
-            text-align: end;
-        }
-    }
+		.meta {
+			text-align: end;
+		}
+	}
 
-    .middle {
-        @include defaultStyle();
-        @include borderStyle();
-    }
+	.middle {
+		@include defaultStyle();
+		@include borderStyle();
+	}
 }
 
 // override active buttons
 .btn:first-child:active {
-    background-color: $green-color-alt;
-    border: 1px solid $green-color-alt;
+	background-color: $green-color-alt;
+	border: 1px solid $green-color-alt;
 }
 
-.btn-check:checked+.btn,
+.btn-check:checked + .btn,
 .btn.active,
 .btn.show,
 .btn:first-child:active,
-:not(.btn-check)+.btn:active {
-    background-color: $green-color-alt;
-    border: 1px solid $green-color-alt;
+:not(.btn-check) + .btn:active {
+	background-color: $green-color-alt;
+	border: 1px solid $green-color-alt;
 }
 
 .btn:disabled {
-    background-color: $green-color;
-    border: 1px solid $green-color-alt;
+	background-color: $green-color;
+	border: 1px solid $green-color-alt;
 }
 
 .dropdown-item.active,
 .dropdown-item:active {
-    background-color: $green-color-alt;
+	background-color: $green-color-alt;
 }
 
 .dropdown-item:focus,
 .dropdown-item:hover {
-    background-color: $green-color;
+	background-color: $green-color;
 }
 
 .form-control:focus {
-    box-shadow: 0 0 0 .25rem $green-color;
+	box-shadow: 0 0 0 0.25rem $green-color;
 }

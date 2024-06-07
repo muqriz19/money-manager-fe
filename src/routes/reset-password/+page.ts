@@ -1,7 +1,7 @@
-export const load = ({ fetch, params, url }) => {
-    let email = url.searchParams.get('email');
+export const load = ({ url }) => {
+	const email = url.searchParams.get('email');
 
-    return {
-        email
-    };
-}
+	return {
+		email
+	};
+};

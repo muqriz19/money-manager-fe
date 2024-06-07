@@ -65,15 +65,11 @@
 			form.logId = logData.id;
 		}
 
-		console.log(transactionData);
-
 		if (transactionData) {
 			form = Object.assign(form, transactionData);
 		}
 
 		const userId = Object.keys(logData).length > 0 ? logData.userId : transactionData.userId;
-
-		console.log(transactionData, logData);
 
 		getAllUserCategories(userId);
 
