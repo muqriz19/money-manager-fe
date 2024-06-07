@@ -193,7 +193,7 @@
 </script>
 
 <div class="page">
-	<div class="account-container page-container">
+	<div class="account-container">
 		<div class="top">
 			<div class="info">
 				<h1>{accountDetails.name}</h1>

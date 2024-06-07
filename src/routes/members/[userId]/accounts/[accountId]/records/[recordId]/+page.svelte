@@ -469,54 +469,52 @@
 </script>
 
 <div class="page">
-	<div class="page-container">
-		<div class="top">
-			<div class="info">
-				<h1>{recordData?.name ?? ''}</h1>
-				<p>{recordData?.description ?? ''}</p>
-			</div>
+	<div class="top">
+		<div class="info">
+			<h1>{recordData?.name ?? ''}</h1>
+			<p>{recordData?.description ?? ''}</p>
+		</div>
 
-			<div class="meta small-text">
-				<span>Created since: {recordData?.createdDate.toDateString()}</span>
+		<div class="meta small-text">
+			<span>Created since: {recordData?.createdDate.toDateString()}</span>
+		</div>
+	</div>
+
+	<div class="middle">
+		<div class="row">
+			<div class="col-sm-4 col-md-4 col-lg-4">
+				<button type="button" class="btn btn-primary" on:click={newLog} title="Add Log"
+					>New Log</button
+				>
 			</div>
 		</div>
 
-		<div class="middle">
-			<div class="row">
-				<div class="col-sm-4 col-md-4 col-lg-4">
-					<button type="button" class="btn btn-primary" on:click={newLog} title="Add Log"
-						>New Log</button
-					>
-				</div>
+		<div class="row">
+			<div class="col-12">
+				<hr />
 			</div>
+		</div>
 
+		{#if recordData.logs.length > 0}
 			<div class="row">
-				<div class="col-12">
-					<hr />
+				<div class="col-sm-12 col-md-6 col-lg-6">
+					<SpaceField
+						logs={recordData.logs}
+						on:action={onSpaceAction}
+						on:total-log-value={getTotalValue}
+					/>
 				</div>
-			</div>
 
-			{#if recordData.logs.length > 0}
-				<div class="row">
-					<div class="col-sm-12 col-md-6 col-lg-6">
-						<SpaceField
-							logs={recordData.logs}
-							on:action={onSpaceAction}
-							on:total-log-value={getTotalValue}
-						/>
-					</div>
-
-					<!-- <div class="col-sm-12 col-md-6 col-lg-6">
+				<!-- <div class="col-sm-12 col-md-6 col-lg-6">
 						<Overview />
 					</div> -->
+			</div>
+		{:else}
+			<div class="row">
+				<div class="col-sm-12 col-md-6 col-lg-6">
+					<p class="p-0">This record has no logs, consider adding one.</p>
 				</div>
-			{:else}
-				<div class="row">
-					<div class="col-sm-12 col-md-6 col-lg-6">
-						<p class="p-0">This record has no logs, consider adding one.</p>
-					</div>
-				</div>
-			{/if}
-		</div>
+			</div>
+		{/if}
 	</div>
 </div>
