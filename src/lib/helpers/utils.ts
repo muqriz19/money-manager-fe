@@ -76,9 +76,9 @@ export function fetchData<T>(method: HTTP_METHOD, apiRoutes: APIS | string, body
 				return resp.json();
 			}
 		})
-		.catch((err) => {
+		.catch(async (err) => {
 			console.log('ERROR BEFORE ', err);
-			const respData = err.json();
+			const respData = await err.json();
 			console.log('ERROR ', respData);
 
 			if (respData && respData.status === 401) {
