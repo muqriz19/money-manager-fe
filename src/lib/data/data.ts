@@ -36,6 +36,7 @@ export interface ForgotPassword {
 export interface ResetPassword {
 	email: string;
 	newPassword: string;
+	resetPasswordTempHash: string;
 }
 
 export interface ProfileData {

@@ -8,6 +8,8 @@
 
 	const form = {
 		email: <string | null>null,
+		resetPasswordTempHash: <string | null>null,
+
 		newPassword: null,
 		confirmPassword: null
 	};
@@ -35,6 +37,10 @@
 		if (data) {
 			if (data.email) {
 				form.email = data.email;
+			}
+
+			if (data.resetPasswordTemp) {
+				form.resetPasswordTempHash = data.resetPasswordTemp;
 			}
 		}
 
@@ -83,7 +89,8 @@
 	function returnFinalFormData() {
 		const finalForm: ResetPassword = {
 			email: form.email!,
-			newPassword: form.newPassword!
+			newPassword: form.newPassword!,
+			resetPasswordTempHash: form.resetPasswordTempHash!
 		};
 
 		return finalForm;

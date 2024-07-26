@@ -15,6 +15,9 @@
 		}
 	};
 
+	const emailRegex =
+		/^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+
 	let isValidForm = false;
 
 	onMount(() => {
@@ -39,12 +42,7 @@
 			validationErrors.email.message = '';
 		}
 
-		if (
-			form.email &&
-			!form.email.match(
-				/^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
-			)
-		) {
+		if (form.email && !form.email.match(emailRegex)) {
 			validationErrors.email.message2 = 'Valid email is required';
 			isValidForm = false;
 		} else {
@@ -66,12 +64,14 @@
 		fetchData<ForgotPassword>(HTTP_METHOD.POST, APIS.FORGOT_PASSWORD, finalForm)
 			.then((resp) => {
 				ToastStore.set({
-					title: 'Forgot Password Initialised',
+					title: 'Forgot password initialised',
 					message: 'Initialising resetting of password',
 					type: 'success'
 				});
 
-				navigateTo('/reset-password?email=' + form.email);
+				const pathRouteReset = `/reset-password?email=${form.email}&resetPasswordTemp=${resp.data}`;
+
+				navigateTo(pathRouteReset);
 			})
 			.catch((err) => {
 				ToastStore.set({
