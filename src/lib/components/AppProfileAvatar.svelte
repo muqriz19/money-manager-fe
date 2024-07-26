@@ -5,6 +5,7 @@
 	import ProfileStore from '../../stores/ProfileStore';
 	import type { RouteItem } from '$lib/data/core';
 	import type { ProfileData } from '$lib/data/data';
+	import { page } from '$app/stores';
 
 	let randomId = 0;
 	let dropdown = {
@@ -12,6 +13,8 @@
 		y: 0,
 		visible: false
 	};
+
+	let currentRoute = ''
 
 	const profileLinks: RouteItem[] = [
 		{
@@ -52,6 +55,8 @@
 				allAllowedLinks = profileLinks.filter((link) => link.name !== 'Login');
 				
 				allAllowedLinks[0].path = `/members/${profileData?.userId}/profile`;
+				currentRoute = `/members/${profileData?.userId}/profile`;
+
 			} else {
 				allAllowedLinks = profileLinks.filter(
 					(link) => link.name !== 'Logout' && link.name !== 'Profile'
@@ -98,6 +103,12 @@
 		clearStorage();
 		currentProfileData = null;
 	}
+
+	function getCurrentRoute(path: string) {
+		currentRoute = path;
+	}
+
+	$: getCurrentRoute($page.url.pathname);
 </script>
 
 <div class="dropdown">
@@ -121,15 +132,22 @@
 
 		{#each allAllowedLinks as link}
 			{#if link?.command}
-				<li><a class="dropdown-item" href={link.path} on:click={link.command}>{link.name}</a></li>
+				<li class="nav-link {currentRoute === link.path ? 'active' : ''}"><a class="dropdown-item" href={link.path} on:click={link.command}>{link.name}</a></li>
 			{:else}
-				<li><a class="dropdown-item" href={link.path}>{link.name}</a></li>
+				<li class="nav-link {currentRoute === link.path ? 'active' : ''}"><a class="dropdown-item" href={link.path}>{link.name}</a></li>
 			{/if}
 		{/each}
 	</ul>
 </div>
 
 <style lang="scss">
+	.active {
+		background-color: $green-color;
+		a {
+			color: $white-color;
+		}
+	}
+
 	button {
 		border-radius: 100%;
 		display: flex;
