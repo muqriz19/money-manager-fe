@@ -28,6 +28,9 @@
 		}
 	};
 
+	const emailRegex =
+		/^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+
 	let isValidForm = false;
 
 	onMount(() => {
@@ -59,12 +62,7 @@
 			validationErrors.email.message = '';
 		}
 
-		if (
-			form.email &&
-			!form.email.match(
-				/^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
-			)
-		) {
+		if (form.email && !form.email.match(emailRegex)) {
 			validationErrors.email.message2 = 'Valid email is required';
 			isValidForm = false;
 		} else {
@@ -201,12 +199,16 @@
 			<button type="submit" class="btn btn-primary mb-3" disabled={!isValidForm}>Save</button>
 			<button type="button" class="btn btn-primary mb-3" on:click={cancel}>Cancel</button>
 
-			<a
-				href="/forgot-password"
-				class="d-flex justify-content-end"
-				style="width: fit-content;
-			margin-left: auto;">Already registered but forgot password, click here</a
+			<a href="/forgot-password" class="d-flex justify-content-end"
+				>Already registered but forgot password, click here</a
 			>
 		</div>
 	</form>
 </div>
+
+<style lang="scss">
+	a {
+		width: fit-content;
+		margin-left: auto;
+	}
+</style>
