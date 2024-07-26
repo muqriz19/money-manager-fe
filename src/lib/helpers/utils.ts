@@ -78,12 +78,13 @@ export function fetchData<T>(method: HTTP_METHOD, apiRoutes: APIS | string, body
 		})
 		.catch(async (err) => {
 			console.log('ERROR BEFORE ', err);
-			const respData = await err.json();
-			console.log('ERROR ', respData);
 
-			if (respData && respData.status === 401) {
+			if (err && err.status === 401) {
 				unauthorizedRequest();
 			}
+
+			let respData = await err.json();
+			console.log('ERROR ', respData.status);
 
 			throw respData;
 		});
