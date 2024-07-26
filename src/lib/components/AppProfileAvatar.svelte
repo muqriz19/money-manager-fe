@@ -50,6 +50,8 @@
 			if (profileData && profileData.token !== '') {
 				currentProfileData = profileData;
 				allAllowedLinks = profileLinks.filter((link) => link.name !== 'Login');
+				
+				allAllowedLinks[0].path = `/members/${profileData?.userId}/profile`;
 			} else {
 				allAllowedLinks = profileLinks.filter(
 					(link) => link.name !== 'Logout' && link.name !== 'Profile'
