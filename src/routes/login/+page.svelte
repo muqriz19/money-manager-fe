@@ -20,6 +20,9 @@
 		}
 	};
 
+	const emailRegex =
+		/^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+
 	let isValidForm = false;
 
 	onMount(() => {
@@ -40,12 +43,8 @@
 		if (!form.email || form.email === '') {
 			validationErrors.email.message = 'Email is required';
 			isValidForm = false;
-		} else if (
-			form.email &&
-			!form.email.match(
-				/^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
-			)
-		) {
+		} else if (form.email && !form.email.match(emailRegex)) {
+			validationErrors.email.message = 'A valid email is required';
 		} else {
 			validationErrors.email.message = '';
 		}
@@ -136,19 +135,18 @@
 			<button type="submit" class="btn btn-primary mb-3" disabled={!isValidForm}>Login</button>
 			<button type="button" class="btn btn-primary mb-3" on:click={cancel}>Cancel</button>
 
-			<a
-				href="/forgot-password"
-				class="d-flex justify-content-end"
-				style="width: fit-content;
-			margin-left: auto;">Forgot your password? Click here</a
+			<a href="/forgot-password" class="d-flex justify-content-end"
+				>Forgot your password? Click here</a
 			>
 
-			<a
-				href="/register"
-				class="d-flex justify-content-end"
-				style="width: fit-content;
-		margin-left: auto;">Don't have an account? Click here</a
-			>
+			<a href="/register" class="d-flex justify-content-end">Don't have an account? Click here</a>
 		</div>
 	</form>
 </div>
+
+<style lang="scss">
+	a {
+		width: fit-content;
+		margin-left: auto;
+	}
+</style>
