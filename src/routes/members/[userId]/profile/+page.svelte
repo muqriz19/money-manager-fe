@@ -9,10 +9,7 @@
 	let unSubscribe: Unsubscriber;
 
 	onMount(() => {
-		// select first tab
-		const button = document.querySelector('#profile-tab') as HTMLButtonElement;
-
-		button.click();
+		triggerFirstTab();
 
 		unSubscribe = ProfileStore.subscribe((profile) => {
 			if (profile) {
@@ -20,6 +17,13 @@
 			}
 		});
 	});
+
+	function triggerFirstTab() {
+		// select first tab
+		const button = document.querySelector('#profile-tab') as HTMLButtonElement;
+
+		button.click();
+	}
 
 	onDestroy(() => {
 		if (unSubscribe) {
