@@ -21,8 +21,6 @@ export function clearAnyLucideIcons(options: ClearLucideOptions, parentElement?:
 		const query = `[class*="lucide"]`;
 		const lucideReferences = document.querySelectorAll(query);
 
-		console.log(lucideReferences);
-
 		if (parentElement) {
 			parentElement.querySelectorAll(query)?.forEach((reference) => {
 				reference.remove();
