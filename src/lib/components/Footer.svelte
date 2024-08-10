@@ -3,10 +3,11 @@
 <style lang="scss">
 	footer {
 		margin-top: 1rem;
-		border-top: 1px solid $grey-color;
 		padding: 10px;
 		height: 50px;
-		background-color: $white-color;
+		background-color: $light-grey-color;
+
+		color: $black-color;
 
 		position: fixed;
 		left: 0;
