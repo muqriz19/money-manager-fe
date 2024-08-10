@@ -43,6 +43,9 @@
 
 	let totalValue = 0;
 
+	let searchLogQuery = '';
+	let finalLogs: LogDto[] = [];
+
 	onMount(() => {
 		ids.userId = Number(data.userId);
 		ids.accountId = Number(data.accountId);
@@ -59,6 +62,15 @@
 		});
 	});
 
+	function setLogs(logsDto: LogDto[]) {
+		return new Promise((resolve) => {
+			recordData.logs = logsDto;
+			finalLogs = logsDto;
+
+			resolve(true);
+		});
+	}
+
 	function fetchRecordData(url: string) {
 		fetchData(HTTP_METHOD.GET, url, null).then((respData) => {
 			if (respData) {
@@ -72,7 +84,7 @@
 					name: respData.data.name
 				};
 
-				recordData.logs = recordData.logs;
+				setLogs(recordData.logs);
 			}
 		});
 	}
@@ -129,9 +141,10 @@
 					if (resp) {
 						const currentLogs = recordData?.logs ? [...recordData?.logs] : [];
 						const allLogs: LogDto[] = [...currentLogs, resp.data];
-						recordData.logs = allLogs;
 
-						recordData.logs = recordData.logs;
+						setLogs(allLogs).then(() => {
+							searchLog();
+						});
 
 						resolve(true);
 					}
@@ -180,7 +193,10 @@
 
 						let indexLog = recordData.logs.findIndex((theLog) => theLog.id === logId);
 						recordData.logs.splice(indexLog, 1);
-						recordData.logs = recordData.logs;
+
+						setLogs(recordData.logs).then(() => {
+							searchLog();
+						});
 
 						resolve(true);
 					})
@@ -202,8 +218,6 @@
 		return new Promise((resolve) => {
 			fetchData(HTTP_METHOD.PUT, url, log)
 				.then((resp) => {
-					console.log('Log Update ', resp);
-
 					ToastStore.set({
 						message: resp.message,
 						title: 'Updated Log',
@@ -221,9 +235,10 @@
 						}
 
 						const allLogs: LogDto[] = [...currentLogs];
-						recordData.logs = allLogs;
 
-						recordData.logs = recordData.logs;
+						setLogs(allLogs).then(() => {
+							searchLog();
+						});
 
 						resolve(true);
 					}
@@ -297,7 +312,9 @@
 							recordData.logs[index] = thatLog;
 						}
 
-						recordData.logs = recordData.logs;
+						setLogs(recordData.logs).then(() => {
+							searchLog();
+						});
 
 						resolve(true);
 					}
@@ -337,7 +354,9 @@
 							recordData.logs[logIndex].transactions[transactionIndex] = resp.data;
 						}
 
-						recordData.logs = recordData.logs;
+						setLogs(recordData.logs).then(() => {
+							searchLog();
+						});
 
 						resolve(true);
 					}
@@ -394,7 +413,9 @@
 						);
 						recordData.logs[indexLog].transactions.splice(indexTransaction, 1);
 
-						recordData.logs = recordData.logs;
+						setLogs(recordData.logs).then(() => {
+							searchLog();
+						});
 
 						resolve(true);
 					})
@@ -466,6 +487,21 @@
 			}
 		}
 	}
+
+	function searchLog() {
+		if (searchLogQuery !== '') {
+			let filteredLogs = recordData.logs.filter((log) => {
+				return (
+					log.name.toLowerCase().includes(searchLogQuery.toLowerCase()) ||
+					log.value.toString().includes(searchLogQuery.toLowerCase())
+				);
+			});
+
+			finalLogs = filteredLogs;
+		} else {
+			finalLogs = recordData.logs;
+		}
+	}
 </script>
 
 <div class="page">
@@ -495,11 +531,32 @@
 			</div>
 		</div>
 
+		<div class="row">
+			<div class="col-12">
+				<div class="mb-3">
+					<label for="searchLog" class="form-label">Search Log</label>
+					<input
+						type="text"
+						class="form-control"
+						id="searchLog"
+						bind:value={searchLogQuery}
+						on:input={searchLog}
+					/>
+				</div>
+			</div>
+		</div>
+
+		<div class="row">
+			<div class="col-12">
+				<hr />
+			</div>
+		</div>
+
 		{#if recordData.logs.length > 0}
 			<div class="row">
 				<div class="col-sm-12 col-md-6 col-lg-6">
 					<SpaceField
-						logs={recordData.logs}
+						logs={finalLogs}
 						on:action={onSpaceAction}
 						on:total-log-value={getTotalValue}
 					/>
