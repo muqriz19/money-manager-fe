@@ -14,7 +14,7 @@
 		visible: false
 	};
 
-	let currentRoute = ''
+	let currentRoute = '';
 
 	const profileLinks: RouteItem[] = [
 		{
@@ -53,10 +53,9 @@
 			if (profileData && profileData.token !== '') {
 				currentProfileData = profileData;
 				allAllowedLinks = profileLinks.filter((link) => link.name !== 'Login');
-				
+
 				allAllowedLinks[0].path = `/members/${profileData?.userId}/profile`;
 				currentRoute = `/members/${profileData?.userId}/profile`;
-
 			} else {
 				allAllowedLinks = profileLinks.filter(
 					(link) => link.name !== 'Logout' && link.name !== 'Profile'
@@ -132,9 +131,13 @@
 
 		{#each allAllowedLinks as link}
 			{#if link?.command}
-				<li class="nav-link {currentRoute === link.path ? 'active' : ''}"><a class="dropdown-item" href={link.path} on:click={link.command}>{link.name}</a></li>
+				<li class="nav-link {currentRoute === link.path ? 'active' : ''}">
+					<a class="dropdown-item" href={link.path} on:click={link.command}>{link.name}</a>
+				</li>
 			{:else}
-				<li class="nav-link {currentRoute === link.path ? 'active' : ''}"><a class="dropdown-item" href={link.path}>{link.name}</a></li>
+				<li class="nav-link {currentRoute === link.path ? 'active' : ''}">
+					<a class="dropdown-item" href={link.path}>{link.name}</a>
+				</li>
 			{/if}
 		{/each}
 	</ul>

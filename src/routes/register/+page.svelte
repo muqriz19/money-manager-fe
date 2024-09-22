@@ -9,7 +9,7 @@
 		email: <string | null>null,
 		password: null,
 		confirmPassword: null,
-		createdDate: null || new Date()
+		createdDate: new Date || null
 	};
 
 	const validationErrors = {

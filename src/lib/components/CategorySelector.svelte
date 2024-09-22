@@ -81,8 +81,6 @@
 			];
 		}
 
-		console.log(filteredCategories);
-
 		clearAnyLucideIcons({ ignoreClass: ['ignoreIcon'] }).then(() => {
 			createLucideIcons(1000);
 		});

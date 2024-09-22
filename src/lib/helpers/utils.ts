@@ -10,7 +10,6 @@ import { PUBLIC_API_URL } from '$env/static/public';
 // const ROOT_API = 'http://localhost:5133/api/';
 const ROOT_API = PUBLIC_API_URL;
 
-
 export enum HTTP_METHOD {
 	GET = 'GET',
 	POST = 'POST',

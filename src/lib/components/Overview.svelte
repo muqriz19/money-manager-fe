@@ -45,8 +45,6 @@
 		barMap.set(TransactionType.Expenses, { label: 'Expenses', value: totalExpense });
 		barMap.set(TransactionType.Income, { label: 'Income', value: totalIncome });
 
-		console.log(barMap);
-
 		const TESTER = document.getElementById('transactionTypeChart') as HTMLCanvasElement;
 
 		new ChartJs(TESTER, {

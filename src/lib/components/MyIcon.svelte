@@ -26,10 +26,50 @@
 		});
 	}
 
+	function createLucideIconHtml() {
+		return new Promise<void>((resolve) => {
+			setTimeout(() => {
+				if (doesLucideITagExist()) {
+					resolve();
+				} else {
+					const i = document.createElement('i');
+
+					const iconName = iconSet?.name ?? '';
+					const set = iconSet?.set ?? '';
+
+					i.setAttribute('class', 'iconSet ' + extraClass);
+					i.setAttribute('data-lucide', iconName);
+					i.setAttribute('data-icon-set', set);
+					i.style.border = 'unset';
+
+					const wrapper = document.querySelector('#iconWrapper' + id);
+					wrapper?.append(i);
+
+					resolve();
+				}
+			}, 10);
+		});
+	}
+
+	function doesLucideITagExist() {
+		const wrapper = document.querySelector('#iconWrapper' + id);
+		const iTag = wrapper?.children[0];
+
+		let doesExist = false;
+
+		if (iTag) {
+			doesExist = iTag.hasAttribute('data-lucide');
+		}
+
+		return doesExist;
+	}
+
 	$: {
 		if (iconSet) {
 			if (iconSet.set == 'lucideIcons') {
-				createLucideIcons(100);
+				createLucideIconHtml().then(() => {
+					createLucideIcons(0);
+				});
 			} else {
 				clearAnyLucideIcons(
 					{ ignoreClass: [] },
@@ -45,7 +85,12 @@
 		{#if iconSet.set === 'bootstrapIcons'}
 			<i class="bi bi-{iconSet.name} {extraClass}" data-icon-set={iconSet?.set} />
 		{:else}
-			<i data-lucide={iconSet?.name} class="iconSet {extraClass}" data-icon-set={iconSet.set} />
+			<i
+				data-lucide={iconSet?.name}
+				class="iconSet {extraClass}"
+				data-icon-set={iconSet.set}
+				style="border: unset"
+			/>
 		{/if}
 	{/if}
 </div>
@@ -56,9 +101,5 @@
 		border-radius: 5px;
 		background-color: $white-color;
 		width: 50px;
-
-		.iconSet {
-			border: unset;
-		}
 	}
 </style>

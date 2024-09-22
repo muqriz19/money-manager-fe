@@ -19,6 +19,7 @@
 	import { SpaceItem, type SpaceAction, type SpaceActions } from '$lib/data/space';
 	import Overview from '$lib/components/Overview.svelte';
 	import JumpPage from '$lib/components/JumpPage.svelte';
+	import { createLucideIcons } from '$lib/helpers/ui';
 
 	export let data: any;
 
@@ -416,6 +417,10 @@
 
 						setLogs(recordData.logs).then(() => {
 							searchLog();
+
+							setTimeout(() => {
+								createLucideIcons();
+							}, 2000);
 						});
 
 						resolve(true);
@@ -505,7 +510,7 @@
 	}
 </script>
 
-<JumpPage></JumpPage>
+<JumpPage />
 
 <div class="page">
 	<div class="top">

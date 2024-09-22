@@ -12,6 +12,7 @@
 	import { createEventDispatcher } from 'svelte';
 	import MyIcon from '../MyIcon.svelte';
 	import OverviewStore from '../../../stores/OverviewStore';
+	import { createLucideIcons } from '$src/lib/helpers/ui';
 
 	const dispatchAction = createEventDispatcher();
 	const dispatchValue = createEventDispatcher();

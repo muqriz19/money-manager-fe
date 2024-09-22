@@ -11,7 +11,10 @@
 		"strict": true
 	},
 	"include": [
-		".svelte-kit/ambient.d.ts"
+		".svelte-kit/ambient.d.ts",
+		"src/**/*.d.ts",
+		"src/**/*.js",
+		"src/**/*.svelte"
 	]
 	// Path aliases are handled by https://kit.svelte.dev/docs/configuration#alias
 	//
